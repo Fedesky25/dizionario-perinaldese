@@ -36,10 +36,18 @@ export async function authorize(cookies: Cookies) {
 
 export async function isAuthorized(cookies: Cookies) {
     const raw = cookies.get("auth");
-    if(!raw || !raw.startsWith(secret)) return false;
-    const start = raw.slice(secret.length);
-    const num = parseInt(start);
+    if(!raw) return false;
+    let text: string;
+    try {
+        const buffer = await crypto.subtle.decrypt(algorith, key.privateKey, stringToBuffer(raw));
+        text = bufferToString(buffer);
+    } catch {
+        return false;
+    }
+    if(!text.startsWith(secret)) return false;
+    const time = text.slice(secret.length);
+    const num = parseInt(time);
     if(Number.isNaN(num) || Date.now() > num + duration) return false;
-    authorize(cookies);
+    await authorize(cookies);
     return true;
 }
