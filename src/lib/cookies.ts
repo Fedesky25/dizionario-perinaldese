@@ -51,3 +51,7 @@ export async function isAuthorized(cookies: Cookies) {
     await authorize(cookies);
     return true;
 }
+
+export function removeAuthorization(cookies: Cookies) {
+    cookies.delete("auth");
+} 
