@@ -1,0 +1,19 @@
+*, *::before, *::after{
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Quicksand, Verdana, Geneva, Tahoma, sans-serif;
+}
+
+:root{
+    --quicksand: Quicksand, Verdana, Geneva, Tahoma, sans-serif;
+
+    --olivina: #9AB973;
+    --olivastro: #6B8E23;
+    --oliva-scuro: #556B2F;
+    --rosso: #BB5E64;
+
+    --olivina-rgb: 154, 185, 115;
+    --olivastro-rgb: 107, 142, 35;
+    --oliva-scuro-rgb: 85, 107, 47;
+    --rosso-rgb: 187, 94, 100;
+}
