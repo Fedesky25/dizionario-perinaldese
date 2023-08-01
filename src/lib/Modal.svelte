@@ -9,13 +9,20 @@
     let confirming = false;
     let arr: RegExpExecArray|null = null;
     // $: arr = hashRegExp.exec($page.url.hash);
-    $: show = arr !== null;
+
+    interface $$Slots {
+        default: {
+            titleID: string;
+            descID: string;
+            data: RegExpExecArray
+        }
+    }
 
     const ID = crypto.randomUUID();
     const titleID = ID + "-title";
     const descID = ID + "-desc";
 
-    function exit() { if(show) history.back(); }
+    function exit() { if(arr) history.back(); }
     function escape(ev: KeyboardEvent) { if(ev.key === "Escape") exit(); }
 
     function setFocus(node: HTMLElement, flag: boolean) {
@@ -42,25 +49,26 @@
 <div 
     role="presentation" 
     class="back-drop" 
-    class:show
+    class:show={!!arr}
     on:click={exit}
     use:move
 ></div>
 <div 
     role="dialog" 
     class="popup" 
-    aria-hidden={!show} 
+    aria-hidden={!arr} 
     aria-labelledby={titleID} 
     aria-describedby={descID} 
     tabindex="-1" 
     on:keyup={escape} 
-    use:setFocus={show}
-    use:move
->
+    use:setFocus={!!arr}
+    use:move>
+    {#if arr}
     <slot {titleID} {descID} data={arr} />
+    {/if}
     <div class="btns">
         <button class:fill={!encourage} on:click={exit}>Annulla</button>
-        <button class:fill={encourage} on:click={exit}>Conferma</button>
+        <button class:fill={encourage} on:click={confirm}>Conferma</button>
     </div>
 </div>
 
