@@ -8,6 +8,7 @@
 
     export let data: PageData;
     let words: Summary[] = data.parole;
+    let can_extend = words.length === 50;
     
     // $: if(data.cached) {
     //     const cache = sessionStorage.getItem("cache");
@@ -20,20 +21,28 @@
 
     const search = writable("");
 
-
     const req: RequestInit = {
         method: "GET",
         credentials: "include",
         headers: { "Accept": "application/json" }
     }
-
+    
+    let first_time = true;
+    async function searchFor(str: string) {
+        if(first_time) return void (first_time = false);
+        const res = await fetch("/admin/dizionario?search="+str, req);
+        words = await res.json();
+        can_extend = words.length === 50;
+    }
+    $: searchFor($search);
+    
     let extending = false;
     async function extend() {
-        if(extending) return;
+        if(extending || !can_extend) return;
         extending = true;
-        const res = await fetch("/admin/dizionario?skip="+words.length, req);
-        // console.log(await res.text());
+        const res = await fetch(`/admin/dizionario?search=${$search}&skip=${words.length}`, req);
         const newWords: Summary[] = await res.json();
+        can_extend = newWords.length === 50;
         words.push(...newWords);
         words = words;
         extending = false;
@@ -75,7 +84,7 @@
         <input type="text" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
             use:debounceInput={{ delay: 500, store: search }}>
-        <a href="/admin/dizionario/nuova">Aggiungi parola</a>
+        <a class="btn" href="/admin/dizionario/nuova">Aggiungi parola</a>
     </div>
     <div class="table-container">
         <table>
@@ -96,28 +105,33 @@
                 <span>Nessun risultato di ricerca</span>
             </div>
         {/if}
+        {#if can_extend}
+            <button class="btn" disabled={extending} on:click={extend}>Carica altri</button>
+        {/if}
     </div>
 </div>
 
 <Modal 
     encourage={true} action={changeDescription}
     hashRegExp={/#descrizione\/(\w+)\/(\d+)/}
-    let:data let:titleID let:descID
->
-    {@const w = words[+(data?.[2]||0)]}
+    let:data let:titleID let:descID>
+    {#if words.length}
+    {@const w = words[+(data[2]||0)]}
     <h2 id={titleID}>Aggiungi una descrizione</h2>
     <p id={descID}>La voce «{w.parola} - {w.traduzione}» non ha una descrizione: scrivila al volo qui sotto.</p>
     <textarea cols="30" rows="6" bind:value={descrizione} on:keydown={handleSpecialChars}></textarea>
+    {/if}
 </Modal>
 
 <Modal 
     encourage={false} action={removeWord}
     hashRegExp={/#rimuovi\/(\w+)\/(\d+)/}
-    let:titleID let:descID let:data    
->
-    {@const w = words[+(data?.[2]||0)]}
+    let:titleID let:descID let:data>
+    {#if words.length}
+    {@const w = words[+(data[2]||0)]}
     <h2 id={titleID}>Rimozione «{w.parola}»</h2>
     <p id={descID}>Sei sicuro di voler rimuovere la voce «{w.parola} - {w.traduzione}»?<br>L'operazione non potrà essere annullata.</p>
+    {/if}
 </Modal>
 
 <style>
@@ -133,12 +147,7 @@
     .interaction {display: flex;}
     .interaction > a {
         display: block;
-        background-color: var(--olivina);
-        color: white;
-        font-weight: 600;
         text-decoration: none;
-        padding: .4rem 1rem;
-        border-radius: var(--small-radius);
     }
     .table-container {
         overflow-y: auto;
@@ -229,4 +238,18 @@
         width: auto;
     }
     textarea {width: 100%;}
+    .btn {
+        background-color: var(--olivina);
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: .2rem;
+        color: white;
+        padding: .5rem 1rem;
+        cursor: pointer;
+    }
+    button {
+        display: block;
+        margin: 2rem auto;
+    }
 </style>
