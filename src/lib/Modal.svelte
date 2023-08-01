@@ -1,12 +1,14 @@
 <script lang="ts">
-    import { page } from "$app/stores";
+    // import { page } from "$app/stores";
+	import { onMount } from "svelte";
 
     export let encourage = true;
     export let hashRegExp: RegExp;
     export let action: (arr: RegExpExecArray) => Promise<any>;
 
     let confirming = false;
-    $: arr = hashRegExp.exec($page.url.hash);
+    let arr: RegExpExecArray|null = null;
+    // $: arr = hashRegExp.exec($page.url.hash);
     $: show = arr !== null;
 
     const ID = crypto.randomUUID();
@@ -30,9 +32,12 @@
         confirming = true;
         await action(arr).catch(() => {});
         confirming = false;
-
     }
+    function syncWithHash() { arr = hashRegExp.exec(window.location.hash); }
+    onMount(syncWithHash);
 </script>
+
+<svelte:window on:hashchange={syncWithHash} />
 
 <div 
     role="presentation" 
