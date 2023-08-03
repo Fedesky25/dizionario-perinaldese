@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { handleSpecialChars , type Summary } from "$lib/word-utils";
+	import { handleSpecialChars } from "$lib/words/utils";
     import { debounceInput } from "$lib/timing";
 	import type { PageData } from "./$types";
     import Modal from "$lib/Modal.svelte";
     import Voce from "./Voce.svelte";
 	import { writable } from "svelte/store";
+	import type { Summary } from "$lib/words/types";
 
     export let data: PageData;
     let words: Summary[] = data.parole;

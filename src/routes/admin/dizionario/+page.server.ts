@@ -1,6 +1,8 @@
 import type { PageServerLoad } from "./$types";
 import { words } from "$lib/db";
-import { summary_projection, type Summary } from "$lib/word-utils";
+import { summary_projection} from "$lib/words/utils";
+import type { Summary } from "$lib/words/types";
+
 
 async function getDocs(params: URLSearchParams) {
     const raw = params.get("pages");

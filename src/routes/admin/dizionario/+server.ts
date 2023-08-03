@@ -1,6 +1,7 @@
 import type { RequestHandler } from "./$types";
 import { words } from "$lib/db";
-import { summary_projection, getSearchFilter, type Summary } from "$lib/word-utils";
+import { summary_projection, getSearchFilter } from "$lib/words/utils";
+import type { Summary } from "$lib/words/types";
 import { json } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {

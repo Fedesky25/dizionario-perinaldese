@@ -6,18 +6,6 @@ export function formatta(radice: string, valore: string) {
     }
 }
 
-export interface Declinazione {
-    ms: string;
-    mp: string;
-    fs: string;
-    fp: string;
-}
-
-export interface Esempio {
-    originale: string;
-    traduzione: string;
-}
-
 export const summary_projection = {
     _id: 1,
     parola: 1,
@@ -32,16 +20,6 @@ export const summary_projection = {
             else: 0
         }
     },
-}
-
-export interface Summary {
-    _id: string;
-    parola: string;
-    traduzione: string;
-    funzione: number;
-    ordine: number;
-    descrizione: string;
-    numero_esempi: number;
 }
 
 export const fgs = [
