@@ -2,11 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Quicksand, Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Quicksand Variable", Verdana, Geneva, Tahoma, sans-serif;
 }
 
 :root{
-    --quicksand: Quicksand, Verdana, Geneva, Tahoma, sans-serif;
+    --quicksand: "Quicksand Variable", Verdana, Geneva, Tahoma, sans-serif;
 
     --olivina: #9AB973;
     --olivastro: #6B8E23;
