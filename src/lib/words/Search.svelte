@@ -11,6 +11,7 @@
         none: string;
     }>();
 
+    export let url: string;
     export let placeholder: string|undefined = undefined;
     export let id: string|undefined = undefined;
     export let delay = 500;
@@ -24,9 +25,8 @@
 
     const jsonReq: RequestInit = {
         method: "GET",
-        headers: {
-            "Accept": "aaplication/json"
-        }
+        credentials: "include",
+        headers: { "Accept": "aaplication/json" }
     }
 
     function emit(index: number) {
@@ -39,7 +39,7 @@
         hidden = false;
         active = -1;
         try {
-            const res = await fetch(encodeURI("/?operazione=cerca&filtro="+query), jsonReq);
+            const res = await fetch(encodeURI(url+query), jsonReq);
             return results = await res.json();
         } catch(err) {
             console.log(err);
