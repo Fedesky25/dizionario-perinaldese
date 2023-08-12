@@ -1,3 +1,14 @@
+<script lang="ts">
+    import { goto } from "$app/navigation";
+    async function logout() {
+        await fetch("/logout", {
+            credentials: "include",
+            method: "POST"
+        });
+        goto("/");
+    }
+</script>
+
 <main>
     <h1>Seleziona l'editor</h1>
     <ul>
@@ -27,6 +38,7 @@
         </li>
     </ul>
 </main>
+<button on:click={logout}>Log out</button>
 
 <style>
     :global(body) {
@@ -118,6 +130,15 @@
         background-position: center;
         color: white;
     }
+    button {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        border: #9AB973 1px solid;
+        padding: .4rem .8rem;
+        background-color: #ffffff20;
+        cursor: pointer;
+    }
     @media (min-width: 50rem) {
         :global(body) {
             height: 100vh;
@@ -134,6 +155,10 @@
         }
         a {
             padding: 2.5rem;
+        }
+        button {
+            bottom: 1rem;
+            right: 1rem;
         }
     }
 </style>
