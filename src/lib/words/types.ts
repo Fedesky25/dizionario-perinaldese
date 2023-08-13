@@ -14,9 +14,9 @@ export enum Funzione {
 }
 
 export interface SinCon {
-    parola: string,
-    cerca: boolean,
-    puntatore?: number
+    contrario: boolean;
+    parola: string;
+    id: number|string;
 }
 
 export interface Esempio {
@@ -46,18 +46,18 @@ export type TempiRaw = [Voci|null, Voci|null, Voci|null, Voci|null, Voci|null, V
 export interface ConiugazioneRaw {
     tipo: TipoVerbo,
     coniuNum: NumeroConiugazione,
-    partPass?: Declinazione,
-    gerundio?: string,
+    partPass: Declinazione|null,
+    gerundio: string|null,
     tempi: TempiRaw|null
 }
 
 export interface Summary {
-    _id: string;
+    id: number;
     parola: string;
     traduzione: string;
     funzione: number;
     ordine: number;
-    descrizione: string;
+    con_descrizione: boolean;
     numero_esempi: number;
 }
 
@@ -68,9 +68,15 @@ export interface Complete<F extends Funzione = Funzione> {
     ordine: number;
     descrizione?: string;
     esempi?: Esempio[];
-    sinonimi?: SinCon[];
-    contrari?: SinCon[];
-    radice: F extends 1|2|3|4 ? string : void;
-    declinazione: F extends 1|2|3 ? Declinazione : void;
-    coniugazione: F extends 4 ? ConiugazioneRaw : void;
+    sin_con?: SinCon[];
+    radice: F extends 1|2|3|4 ? string : null;
+    declinazione: F extends 1|2|3 ? Declinazione : null;
+    coniugazione: F extends 4 ? ConiugazioneRaw : null;
+}
+
+export interface SearchResult {
+    id: number|null;
+    parola: string;
+    traduzione: string;
+    funzione: string;
 }
