@@ -1,18 +1,3 @@
-export enum Funzione {
-    nome_comune = 1,
-    aggettivo,
-    prep_art,
-    verbo,
-    nome_proprio,
-    perp_sempl,
-    articolo,
-    avverbio,
-    pronome,
-    esclamazione,
-    part_morf,
-    coniugazione,
-}
-
 export interface SinCon {
     contrario: boolean;
     parola: string;
@@ -45,8 +30,8 @@ export type TempiRaw = [Voci|null, Voci|null, Voci|null, Voci|null, Voci|null, V
 
 export interface ConiugazioneRaw {
     tipo: TipoVerbo,
-    coniuNum: NumeroConiugazione,
-    partPass: Declinazione|null,
+    numero: NumeroConiugazione,
+    participio: Declinazione|null,
     gerundio: string|null,
     tempi: TempiRaw|null
 }
@@ -61,18 +46,32 @@ export interface Summary {
     numero_esempi: number;
 }
 
-export interface Complete<F extends Funzione = Funzione> {
+export type Complete = {
     parola: string;
     traduzione: string;
-    funzione: F;
+    funzione_display: string;
     ordine: number;
-    descrizione?: string;
-    esempi?: Esempio[];
-    sin_con?: SinCon[];
-    radice: F extends 1|2|3|4 ? string : null;
-    declinazione: F extends 1|2|3 ? Declinazione : null;
-    coniugazione: F extends 4 ? ConiugazioneRaw : null;
-}
+    descrizione: string|null;
+    esempi: Esempio[]|null;
+    sin_con: SinCon[]|null;
+} & (
+    {
+        funzione: 1|2|3;
+        radice: string;
+        declinazione: Declinazione;
+        coniugazione: null;
+    } | {
+        funzione: 4;
+        radice: string;
+        declinazione: null;
+        coniugazione: ConiugazioneRaw;
+    } | {
+        funzione: 5|6|7|8|9|10|11|12;
+        radice: null|"";
+        declinazione: null;
+        coniugazione: null;
+    }
+)
 
 export interface SearchResult {
     id: number|null;
