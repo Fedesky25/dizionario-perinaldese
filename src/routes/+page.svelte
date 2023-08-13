@@ -3,13 +3,14 @@
     import Collapsible from "$lib/Collapsible.svelte";
     import { Tab, TabContainer } from "$lib/tabs";
 	import type { Complete } from "$lib/words/types";
+    import Display from "$lib/words/display/Index.svelte";
 
     let rolling = false;
     function random() {
 
     }
 
-    let word: Complete[]|null = null;
+    let words: Complete[]|null = null;
     let retrieving = false;
 
     async function select(id: number|null, parola: string) {
@@ -20,7 +21,7 @@
             method: "GET",
         });
         if(res.ok) {
-            word = await res.json();
+            words = await res.json();
         }
     }
 </script>
@@ -43,8 +44,10 @@
         </ul>
     </nav>
     <div class="side-bar"></div>
-    <h3 class="from-left">Dizionario</h3>
-    <h1 class="from-left">Pȓeiñaudencu</h1>
+    <h1 class="from-left">
+        <span>Dizionario</span>
+        <span>Pȓeiñaudencu</span>
+    </h1>
     <p class="from-bottom introduction">Il portale online di parole e detti della parlata ligure perinaldese: cerca ora un termine in italiano o in pȓeiñaudencu!</p>
     <div class="color-rect from-top"></div>
     <div class="ricerca-box">
@@ -68,7 +71,13 @@
             </svg>
         </button>
     </div>
-    <div id="word-show" class:hide={!word}></div>
+    <div id="word-show" class:hide={!words}>
+        {#if words}
+        {#each words as word}
+            <Display {word} />
+        {/each}
+        {/if}
+    </div>
     <div class="convenzioni" id="convenzioni">
         <h2 class="from-top small">Convenzioni</h2>
         <div class="side-bar"></div>
@@ -233,16 +242,19 @@
         background-color: lightslategray;
         grid-row: 4/6;
     }
-    .griglia h3 {
-        grid-row: 4/5;
-        grid-column: 3/5;
-        font-size: 1.1rem;
-        line-height: 1rem;
-    }
     h1 {
         grid-row: 5/6;
         grid-column: 3/5;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+    h1 :first-child {
+        font-size: 1.1rem;
+        line-height: 1rem;
+    }
+    h1 :last-child {
         font-size: 2.5rem;
         line-height: 2.4rem;
     }
@@ -392,16 +404,15 @@
         }
         nav ul li a:hover {color: #eee;}
 
-        .griglia h3 {
-            grid-row: 4/5;
-            grid-column: 3/4;
-            font-size: 1.3rem;
-            line-height: 1.2rem;
-        }
         h1 {
             grid-row: 5/6;
             grid-column: 3/6;
-            width: 100%;
+        }
+        h1 :first-child {
+            font-size: 1.3rem;
+            line-height: 1.2rem;
+        }
+        h1 :last-child {
             font-size: 4.2rem;
             line-height: 3.8rem;
         }
@@ -409,11 +420,23 @@
             grid-row: 7/8;
             grid-column: 3/4;
         }
-        .griglia .color-rect {
+        .color-rect {
             background-color: #9AB973;
             grid-row: 1/9;
             grid-column: 5/8;
             z-index: -2;
+            position: relative;
+        }
+        .color-rect::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 5rem;
+            background-color: #9AB973;
+            transform: translateY(-100%);
         }
         /*.griglia .water-mark.perinaldese {
             grid-row: 8/11;
