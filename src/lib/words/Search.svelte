@@ -87,19 +87,21 @@
         use:debounceInput={{ delay, store: text }}>
     <div class="box" aria-hidden={hidden}>
         {#if query.length === 0}
-            <p class="no-sel">Mentre scrivi in italiano o in perinaldese compariranno i risultati; con 1 o 2 lettere vedrai solo le parole che combaciano esattamente.</p>
-            <slot name="empty" />
+            <div class="padded">
+                <p class="no-sel">Mentre scrivi in italiano o in perinaldese compariranno i risultati; con 1 o 2 lettere vedrai solo le parole che combaciano esattamente.</p>
+                <slot name="empty" />
+            </div>
         {:else}
             {#await retrieve(query)}
                 <Loading />
             {:then results} 
                 {#if results.length === 0}
-                <p>Nessun risultato</p>
+                <p class="padded">Nessun risultato</p>
                 {:else}
                 <ul>
                     {#each results as word, i}
                         <li>
-                            <button tabindex={-hidden} class:active={i === active} data-index={i} on:click={select}>
+                            <button tabindex={-hidden} class="padded" class:active={i === active} data-index={i} on:click={select}>
                                 <span class="lex">{word.parola}</span>
                                 <span class="fgs">{word.funzione}</span>
                                 <span class="tra">{word.traduzione}</span>
@@ -123,7 +125,7 @@
         border: none;
         font-family: inherit;
         font-weight: inherit;
-        font-size: var(--search-fs, 1rem);
+        font-size: var(--search-fs, 1em);
         background-color: transparent;
     }
     input:focus {
@@ -161,7 +163,7 @@
         opacity: 0;
     }
 
-    p, button {
+    .padded {
         padding: .4rem 1rem;
     }
     ul {
