@@ -18,3 +18,9 @@
     --oliva-scuro-rgb: 85, 107, 47;
     --rosso-rgb: 187, 94, 100;
 }
+
+@media (min-width: 50rem) {
+    html, body {
+        overscroll-behavior: none;
+    }
+}
