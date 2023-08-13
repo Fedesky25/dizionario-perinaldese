@@ -6,11 +6,13 @@
 
 <div>
     <input type="checkbox" id={id} bind:checked={open}>
-    {#if title}
-    <label for={id}>{title}</label>
+    {#if title || $$slots.title}
+    <label for={id}>
+        <slot name="title">{title}</slot>
+    </label>
     {/if}
     <div class="grid">
-        <div><slot /></div>
+        <div class="inner"><slot /></div>
     </div>
 </div>
 
@@ -23,31 +25,36 @@
         transform: scale(0);
     }
     .grid {
-        opacity: 0;
         display: grid;
-        grid-template-columns: 0fr;
-        transition: grid-template-columns .3s linear, opacity .3s linear;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 150ms ease-in-out;
+    }
+    .inner {
+        min-height: 0;
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+        transition: opacity 150ms ease-in-out, clip-path 150ms ease-in-out;
     }
     input:checked ~ .grid {
         opacity: 1;
-        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+    }
+    input:checked ~ .grid > .inner {
+        clip-path: inset(0);
+        opacity: 1;
     }
     label {
         display: block;
-        margin: 0 auto;
-        width: max-content;
         position: relative;
         cursor: pointer;
         user-select: none;
-        font-size: 1.5em;
-        font-weight: 700;
     }
     label::after {
         content: '';
-        position: absolute;
-        top: calc(50% - 4px);
-        right: -20px;
-        border-right: 6px solid lightslategray;
+        height: 0;
+        display: inline-block;
+        margin-left: 1ch;
+        border-right: 6px solid var(--collapsible-marker-color, rgba(119, 136, 153, 0.6));
         border-bottom: 6px solid transparent;
         border-top: 6px solid transparent;
         transform: translateX(-3px);
