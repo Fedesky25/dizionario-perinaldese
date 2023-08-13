@@ -2,7 +2,7 @@
     import Search from "$lib/words/Search.svelte";
     import Collapsible from "$lib/Collapsible.svelte";
     import { Tab, TabContainer } from "$lib/tabs";
-	import type { SearchResult, Complete } from "$lib/words/types";
+	import type { Complete } from "$lib/words/types";
 
     let rolling = false;
     function random() {
@@ -68,7 +68,7 @@
             </svg>
         </button>
     </div>
-    <div id="word-show"></div>
+    <div id="word-show" class:hide={!word}></div>
     <div class="convenzioni" id="convenzioni">
         <h2 class="from-top small">Convenzioni</h2>
         <div class="side-bar"></div>
@@ -319,7 +319,13 @@
     .text > p,
     .text > ul {
         margin-bottom: 1rem;
+        break-inside: avoid;
+    }
+    .text > p {
         text-align: justify;
+    }
+    .text > ul {
+        padding-left: 2.5ch;
     }
     .text > ul > li {margin-bottom: .4rem;}
     .central-p {
@@ -588,6 +594,7 @@
     }
     form textarea {
         resize: vertical;
+        min-height: 8rem;
     }
     form label {
         font-size: 12pt;
