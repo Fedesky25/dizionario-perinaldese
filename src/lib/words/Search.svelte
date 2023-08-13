@@ -135,13 +135,15 @@
     .box {
         z-index: 1;
         position: absolute;
-        width: 35ch;
-        max-width: 90vw;
+        min-width: 25ch;
+        width: max-content;
+        max-width: min(90vw, 45ch);
         top: calc(100% + var(--search-space-below, 1rem));
         left: 50%;
         opacity: 0;
         transform-origin: top center;
         box-shadow: 0 0 35px 0 rgba(0, 0, 0, .13);
+        background-color: #fffffff3;
         border-radius: 15px;
         color: #111;
         font-weight: 500;
@@ -191,6 +193,7 @@
         grid-template-columns: auto auto;
         transition: background-color .1s ease;
         border-radius: .5rem;
+        column-gap: 3ch;
 
         font-size: inherit;
         background: none;
