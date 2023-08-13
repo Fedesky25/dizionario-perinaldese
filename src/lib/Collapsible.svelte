@@ -48,7 +48,6 @@
         position: relative;
         cursor: pointer;
         user-select: none;
-        margin-bottom: .3rem;
     }
     label::after {
         content: '';
