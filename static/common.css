@@ -24,3 +24,8 @@
         overscroll-behavior: none;
     }
 }
+
+button, input, textarea {
+    font-size: inherit;
+    font-family: inherit;
+}
