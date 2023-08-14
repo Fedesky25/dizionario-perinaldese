@@ -2,27 +2,25 @@
     import Search from "$lib/words/Search.svelte";
     import Collapsible from "$lib/Collapsible.svelte";
     import { Tab, TabContainer } from "$lib/tabs";
-	import type { Complete } from "$lib/words/types";
     import Display from "$lib/words/display/Index.svelte";
 
+    import type { PageData } from "./$types";
+	import { goto } from "$app/navigation";
+
+    export let data: PageData;
+    $: console.log(data);
+
     let rolling = false;
-    function random() {
+    function random() {}
 
-    }
-
-    let words: Complete[]|null = null;
     let retrieving = false;
-
     async function select(id: number|null, parola: string) {
         if(retrieving) return;
         retrieving = true;
-        const res = await fetch("/?operazione=ottieni&filtro="+(id||parola), {
-            headers: {"Accept": "application/json"},
-            method: "GET",
+        await goto("/?parola="+(id||parola), {
+            keepFocus: true,
+            noScroll: true
         });
-        if(res.ok) {
-            words = await res.json();
-        }
         retrieving = false;
     }
 </script>
@@ -72,9 +70,12 @@
             </svg>
         </button>
     </div>
-    <div id="word-show" class:hide={!words}>
-        {#if words}
-        {#each words as word}
+    <div id="word-show">
+        {#if data.error}
+            <h2 class="code">{data.code}</h2>
+            <p class="error">{data.error}</p>
+        {:else if data.words}
+        {#each data.words as word}
             <Display {word} />
         {/each}
         {/if}
@@ -84,7 +85,7 @@
         <div class="side-bar"></div>
         <p class="from-right"> 
             Per rappresentare i fonemi della parlata perinaldese in forma scritta, vengono usati speciali caratteri. 
-            Sono stati adottati in buona parte le convenzioni del V.P.L. - Vocabolario delle Parlate Liguri - ma in 
+            Sono stati adottati in buona parte le convenzioni del Vocabolario delle Parlate Liguri, ma in 
             alcuni casi abbiamo reputato necessario differire in parte.
         </p>
         <ul class="from-right">
@@ -198,6 +199,15 @@
     h2 {
         font-size: 2rem;
         text-align: center;
+    }
+    h2.code {
+        color: #BB5E64;
+        font-size: 4rem;
+    }
+    p.error {
+        text-align: center;
+        max-width: 25ch;
+        margin: .3rem auto;
     }
     .griglia {
         display: grid;
@@ -593,7 +603,7 @@
     }
 
     #word-show {transition: opacity .2s ease-in;}
-    #word-show.hide {opacity: 0;}
+    /* #word-show.hide {opacity: 0;} */
 
     form input[type=text], form input[type=email], form textarea {
         width: 100%;
