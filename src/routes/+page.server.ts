@@ -15,7 +15,6 @@ export const load: PageServerLoad = async ({ url }) => {
         ? supabase.rpc("parola_singola", {id_parola: id})
         : supabase.rpc("parola_multipla", {parola_esatta: parola})
     );
-    console.log(res);
     if(res.error) {
         console.error(res.error);
         return {

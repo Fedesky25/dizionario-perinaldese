@@ -8,7 +8,6 @@
 	import { goto } from "$app/navigation";
 
     export let data: PageData;
-    $: console.log(data);
 
     let rolling = false;
     function random() {}
