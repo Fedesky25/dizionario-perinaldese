@@ -7,9 +7,11 @@
 <div>
     <input type="checkbox" id={id} bind:checked={open}>
     {#if title || $$slots.title}
-    <label for={id}>
-        <slot name="title">{title}</slot>
-    </label>
+    <div class="head">
+        <label for={id}>
+            <slot name="title">{title}</slot>
+        </label>
+    </div>
     {/if}
     <div class="grid">
         <div class="inner"><slot /></div>
@@ -43,22 +45,32 @@
         clip-path: inset(0);
         opacity: 1;
     }
+    .head {
+        display: flex;
+        justify-content: var(--collapsible-head-justify, left);
+    }
     label {
         display: block;
         position: relative;
         cursor: pointer;
         user-select: none;
+        padding-right: 2ch;
+        width: fit-content;
+        text-align: inherit;
     }
     label::after {
         content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
         height: 0;
         display: inline-block;
         margin-left: 1ch;
         border-right: 6px solid var(--collapsible-marker-color, rgba(119, 136, 153, 0.6));
         border-bottom: 6px solid transparent;
         border-top: 6px solid transparent;
-        transform: translateX(-3px);
+        transform: translate(-3px,-50%);
         transition: transform .3s ease;
     }
-    input:checked + label::after {transform: translateX(-3px) rotate(-90deg);}
+    input:checked + .head > label::after {transform: translate(-3px,-50%) rotate(-90deg);}
 </style>
