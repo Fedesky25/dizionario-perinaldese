@@ -23,3 +23,22 @@
         <td>{data.fp ? formatta(radice, data.fp) : '-'}</td>
     </tr>
 </table>
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    th {
+        font-weight: 550;
+    }
+    th, td {
+        padding: .4ch .8ch;
+        text-align: center;
+    }
+    tr > :first-child {
+        border-right: #444 solid 1px;
+    }
+    tr:first-child > * {
+        border-bottom: #444 solid 1px;
+    }
+</style>
