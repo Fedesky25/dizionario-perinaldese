@@ -60,7 +60,7 @@
 <SinConTag title="Contrari" data={contrari} />
 {#if word.esempi && word.esempi.length}
     <h3>Esempi</h3>
-    <table>
+    <table class="esempi">
         <tr>
             <th>Originale</th>
             <th>Traduzione</th>
@@ -96,26 +96,84 @@
         </ul>
         <Collapsible>
             <h4 slot="title">Indicativo</h4>
-            <Tempo nome="Presente" voci={coniugazione.indicativo.presente} />
-            <Tempo nome="Passato prossimo" voci={coniugazione.indicativo.passato_prossimo} />
-            <Tempo nome="Imperfetto" voci={coniugazione.indicativo.imperfetto} />
-            <Tempo nome="Trapassato prossimo" voci={coniugazione.indicativo.trapassato_prossimo} />
-            <Tempo nome="Futuro semplice" voci={coniugazione.indicativo.futuro_semplice} />
-            <Tempo nome="Futuro anteriore" voci={coniugazione.indicativo.futuro_anteriore} />
+            <div class="cols">
+                <Tempo nome="Presente" voci={coniugazione.indicativo.presente} />
+                <Tempo nome="Passato prossimo" voci={coniugazione.indicativo.passato_prossimo} />
+                <Tempo nome="Imperfetto" voci={coniugazione.indicativo.imperfetto} />
+                <Tempo nome="Trapassato prossimo" voci={coniugazione.indicativo.trapassato_prossimo} />
+                <Tempo nome="Futuro semplice" voci={coniugazione.indicativo.futuro_semplice} />
+                <Tempo nome="Futuro anteriore" voci={coniugazione.indicativo.futuro_anteriore} />
+            </div>
         </Collapsible>
         <Collapsible>
             <h4 slot="title">Congiuntivo</h4>
-            <Tempo nome="Presente" voci={coniugazione.congiuntivo.presente} />
-            <Tempo nome="Passato" voci={coniugazione.congiuntivo.passato} />
-            <Tempo nome="Imperfetto" voci={coniugazione.congiuntivo.imperfetto} />
-            <Tempo nome="Trapassato" voci={coniugazione.congiuntivo.trapassato} />
+            <div class="cols">
+                <Tempo nome="Presente" voci={coniugazione.congiuntivo.presente} />
+                <Tempo nome="Passato" voci={coniugazione.congiuntivo.passato} />
+                <Tempo nome="Imperfetto" voci={coniugazione.congiuntivo.imperfetto} />
+                <Tempo nome="Trapassato" voci={coniugazione.congiuntivo.trapassato} />
+            </div>
         </Collapsible>
         <Collapsible>
             <h4 slot="title">Condizionale</h4>
-            <Tempo nome="Presente" voci={coniugazione.condizionale.presente} />
-            <Tempo nome="Passato" voci={coniugazione.condizionale.passato} />
+            <div class="cols">
+                <Tempo nome="Presente" voci={coniugazione.condizionale.presente} />
+                <Tempo nome="Passato" voci={coniugazione.condizionale.passato} />
+            </div>
         </Collapsible>
     </div>
 {/if}
 
 
+<style>
+    h2 {
+        color: #6B8E23;
+        font-size: 3rem;
+    }
+    h2:not(:first-of-type) {
+        margin-top: 5rem;
+    }
+    h3 {
+        font-size: 1.2rem;
+        margin-top: 2rem;
+    }
+    .funzione {
+        font-weight: 600;
+    }
+    .descrizione {
+        margin-top: .2rem;
+    }
+    .esempi {
+        border-collapse: collapse;
+        text-align: center;
+    }
+    th {
+        font-weight: 550;
+        border-bottom: 1px solid #444;
+    }
+    th, td {
+        padding: .4ch .8ch;
+    }
+    th:first-child,
+    td:first-child {
+        border-right: 1px solid #444;
+    }
+    .esempi tr:nth-child(2n) td {
+        background-color: rgba(119, 136, 153, 0.05);
+        --r: .3rem;
+    }
+    .esempi tr:nth-child(2n) td:first-child {
+        border-bottom-left-radius: var(--r);
+        border-top-left-radius: var(--r);
+    }
+    .esempi tr:nth-child(2n) td:last-child {
+        border-bottom-right-radius: var(--r);
+        border-top-right-radius: var(--r);
+    }
+    .cols {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(21ch, 1fr));
+        grid-auto-flow: row;
+        gap: 1.5ch;
+    }
+</style>
