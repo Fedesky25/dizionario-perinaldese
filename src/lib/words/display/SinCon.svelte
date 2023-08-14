@@ -10,7 +10,7 @@
 </script>
 
 {#if data.length}
-    <div class="one-line">
+    <div>
         <h3>{title}:</h3>
         <ul>
             {#each data as item}
@@ -25,4 +25,28 @@
         </ul>
     </div>
 {/if}
+
+<style>
+    div {
+        display: flex;
+        align-items: baseline;
+        margin-top: 2rem;
+    }
+    h3 {
+        font-size: 1.2rem;
+    }
+    ul {
+        list-style: none;
+        display: flex;
+        padding-left: 0;
+    }
+    li {
+        margin-left: 1.5ch;
+    }
+    button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+    }
+</style>
 
