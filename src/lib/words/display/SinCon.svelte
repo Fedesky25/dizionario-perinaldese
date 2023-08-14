@@ -3,10 +3,6 @@
 
     export let title: string;
     export let data: SinCon[];
-
-    function wordLink(this: HTMLButtonElement) {
-
-    }
 </script>
 
 {#if data.length}
@@ -15,11 +11,11 @@
         <ul>
             {#each data as item}
                 <li>
-                    <button 
-                        data-id={item.id} 
-                        data-parola={item.parola}
-                        on:click={wordLink}
-                    >{item.parola}</button>
+                    <a 
+                        href="/?parola={item.id||item.parola}"
+                        data-sveltekit-noscroll
+                        data-sveltekit-keepfocus
+                    >{item.parola}</a>
                 </li>
             {/each}
         </ul>
@@ -44,7 +40,8 @@
     li {
         margin-left: 1.5ch;
     }
-    button {
+    a {
+        color: inherit;
         border: none;
         background: transparent;
         cursor: pointer;
