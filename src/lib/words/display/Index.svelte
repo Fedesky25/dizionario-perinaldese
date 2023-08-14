@@ -51,7 +51,7 @@
     $: [sinonimi, contrari] = splitSinCon(word.sin_con || []);
 </script>
 
-<h2>{word.parola} - {word.traduzione}</h2>
+<h2>{word.parola} &ndash; {word.traduzione}</h2>
 <span class="funzione">[{word.funzione_display}{extra_fg ? ' '+extra_fg : ''}]</span>
 {#if word.descrizione}
     <p class="descrizione">{word.descrizione}</p>
@@ -81,19 +81,21 @@
     {@const coniugazione = coniuga(word.radice, word.coniugazione)}
     <h3>Coniugazione</h3>
     <div class="coniugazione">
-        <h4>Tempi infiniti</h4>
-        <ul>
-            <li>Infinito presente: {word.parola}</li>
-            <li>Ferundio presente: {coniugazione.gerundio}</li>
-            <li>
-                <span>Participio passato:</span>
-                {#if coniugazione.avere}
+        <div>
+            <h4>Tempi infiniti</h4>
+            <ul>
+                <li>Infinito presente: {word.parola}</li>
+                <li>Ferundio presente: {coniugazione.gerundio}</li>
+                <li>
+                    <span>Participio passato:</span>
+                    {#if coniugazione.avere}
                     {coniugazione.participio.ms}
-                {:else}
+                    {:else}
                     <DeclinazioneTag radice={word.radice} data={coniugazione.participio} />
-                {/if}
-            </li>
-        </ul>
+                    {/if}
+                </li>
+            </ul>
+        </div>
         <Collapsible>
             <h4 slot="title">Indicativo</h4>
             <div class="cols">
@@ -128,14 +130,21 @@
 <style>
     h2 {
         color: #6B8E23;
-        font-size: 3rem;
+        font-size: 2.7rem;
+        text-align: left;
+        margin-bottom: .7rem;
     }
     h2:not(:first-of-type) {
         margin-top: 5rem;
     }
     h3 {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         margin-top: 2rem;
+        color: #556B2F;
+    }
+    h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
     }
     .funzione {
         font-weight: 600;
@@ -169,6 +178,18 @@
     .esempi tr:nth-child(2n) td:last-child {
         border-bottom-right-radius: var(--r);
         border-top-right-radius: var(--r);
+    }
+    .coniugazione {
+        padding-left: 1.6ch;
+        padding-top: .35rem;
+        padding-bottom: .35rem;
+        border-left: 2px solid hsl(210, 14%, 93%);
+    }
+    .coniugazione ul {
+        padding-left: 2.5ch;
+    }
+    .coniugazione > :global(*) + :global(*) {
+        margin-top: 1rem;
     }
     .cols {
         display: grid;

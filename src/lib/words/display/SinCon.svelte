@@ -33,7 +33,8 @@
         margin-top: 2rem;
     }
     h3 {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        color: #556B2F;
     }
     ul {
         list-style: none;
@@ -47,6 +48,7 @@
         border: none;
         background: transparent;
         cursor: pointer;
+        text-decoration: underline dashed var(--olivina);
     }
 </style>
 
