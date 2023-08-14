@@ -23,6 +23,7 @@
         if(res.ok) {
             words = await res.json();
         }
+        retrieving = false;
     }
 </script>
 
@@ -489,6 +490,7 @@
         }
         .convenzioni ul {
             list-style: none;
+            --collapsible-head-justify: right;
         }
         .convenzioni li {
             margin-bottom: .8rem;
