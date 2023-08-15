@@ -23,7 +23,6 @@
     div {
         display: flex;
         align-items: baseline;
-        margin-top: 2rem;
     }
     ul {
         list-style: none;
