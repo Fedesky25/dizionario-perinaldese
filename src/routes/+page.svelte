@@ -22,7 +22,16 @@
         });
         retrieving = false;
     }
+
+    let scrollY: number
 </script>
+
+<svelte:head>
+    <title>Dizionario Perinaldese{data.words ? ' — ' + data.words[0].parola : ''}</title>
+    <meta name="description" content="Il portale online di parole e detti della parlata ligure perinaldese: cerca ora un termine in italiano o in pȓeiñaudencu!" />
+</svelte:head>
+
+<svelte:window bind:scrollY />
 
 <div class="griglia">
     <svg viewBox="-10 -10 370 470" id="logo">
@@ -83,9 +92,7 @@
         <h2 class="from-top small">Convenzioni</h2>
         <div class="side-bar"></div>
         <p class="from-right"> 
-            Per rappresentare i fonemi della parlata perinaldese in forma scritta, vengono usati speciali caratteri. 
-            Sono stati adottati in buona parte le convenzioni del Vocabolario delle Parlate Liguri, ma in 
-            alcuni casi abbiamo reputato necessario differire in parte.
+            Per rappresentare i fonemi della parlata perinaldese in forma scritta, vengono usati speciali caratteri. Sono stati adottati in buona parte le convenzioni del Vocabolario delle Parlate Liguri, ma in alcuni casi abbiamo reputato necessario differire in parte.
         </p>
         <ul class="from-right">
             <li>
@@ -176,7 +183,7 @@
     <br><br>
     Dizionario Pȓeiñaudencu&trade; 2020-2022
 </footer>
-<div class="water-mark perinaldese" role="presentation" aria-hidden="true">Pȓeiñaudencu</div>
+<div class="water-mark perinaldese" style:--b="{scrollY*0.2}px" role="presentation" aria-hidden="true">Pȓeiñaudencu</div>
 
 <style>
     :global(body){overflow-x: hidden;}
@@ -376,7 +383,7 @@
 
     @media screen and (min-width: 860px) {
         .water-mark {
-            bottom: 2rem;
+            bottom: 5rem;
             left: 5rem;
             top: unset;
             right: unset;
@@ -480,7 +487,7 @@
             grid-template-columns: auto 5px;
             grid-template-rows: repeat(3,auto);
             column-gap: 1.25rem;
-            row-gap: 2rem;
+            row-gap: 1rem;
             padding: 0;
         }
         .convenzioni .side-bar {
@@ -502,16 +509,17 @@
             --collapsible-head-justify: right;
         }
         .convenzioni li {
-            margin-bottom: .8rem;
+            margin-bottom: 1rem;
             position: relative;
         }
         .convenzioni li::after {
             content: '';
             position: absolute;
-            right: -25px;
+            right: -1.25rem;
             top: 3px;
             bottom: 2px;
             width: 5px;
+            transform: translateX(100%);
             background-color: rgba(119, 136, 153, .15);
             border-radius: 2.5px;
         }
