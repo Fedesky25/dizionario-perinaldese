@@ -1,19 +1,37 @@
 import type { RequestHandler } from "./$types";
-import { words } from "$lib/db";
-import { summary_projection, getSearchFilter } from "$lib/words/utils";
-import type { Summary } from "$lib/words/types";
-import { json } from "@sveltejs/kit";
+import { supabase } from "$lib/db";
+import { error, json } from "@sveltejs/kit";
+import { getSearchFilter } from "$lib/words/utils";
+import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 export const GET: RequestHandler = async ({ url }) => {
-    const search = url.searchParams.get("search") || '';
-    const filter = search ? getSearchFilter(search) : {};
-    const skip = Math.abs(Math.round(+(url.searchParams.get("skip") || 0)));
-    const res = await words.find(filter, {
-        limit: 50, skip,
-        sort: {_id: -1},
-        projection: summary_projection
-    }).toArray() as unknown[] as Summary[];
-    
-    return json(res);
+    const option = url.searchParams.get("opzione");
+    const parameter = url.searchParams.get("parametro");
+    let res: PostgrestSingleResponse<any>;
+    switch(option) {
+        case "riassunto": {
+            const salta = +(parameter || 0);
+            if(!Number.isInteger(salta) || salta < 0) throw error(400, {
+                message: "Richiesta invalida",
+                details: "Il parametro deve esse un numero intero positivo"
+            });
+            res = await supabase.rpc("riassunto", {salta});
+            break;
+        }
+        case "cerca": {
+            const filter = getSearchFilter(parameter||'');
+            res = await supabase.rpc("ricerca_singola", filter);
+            break;
+        }
+        default:
+            throw error(400, {
+                message: "Richiesta invalida",
+                details: "Opzione non valida"
+            });
+    }
+    if(res.error) throw error(500, {
+        message: res.error.message,
+        details: res.error.details
+    });
+    return json(res.data);
 }
-

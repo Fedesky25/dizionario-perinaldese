@@ -8,7 +8,7 @@
 	import type { Summary } from "$lib/words/types";
 
     export let data: PageData;
-    let words: Summary[] = data.parole;
+    let words: Summary[] = data.words;
     let can_extend = words.length === 50;
     
     // $: if(data.cached) {
@@ -59,7 +59,7 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({descrizione})
         });
-        if(res.ok) words[+arr[2]].descrizione = descrizione; 
+        if(res.ok) words[+arr[2]].con_descrizione = true; 
         descrizione = '';
     }
     async function removeWord(arr: RegExpExecArray) {
@@ -96,7 +96,7 @@
                 <th>Desc.</th>
                 <th>Esempi</th>
             </tr>
-            {#each words as word, index (word._id)}
+            {#each words as word, index (word.id)}
                 <Voce {word} {index} />
             {/each}
         </table>
@@ -153,6 +153,8 @@
     .table-container {
         overflow-y: auto;
         max-height: 100%;
+        scrollbar-width: thin;
+        scrollbar-color: #e1e1e1 transparent;
     }
     table {
         width: 100%;
@@ -210,7 +212,7 @@
             grid-column: 2;
             grid-row: 1/6;
             background-color: white;
-            border-radius: var(--large-radius);
+            border-radius: 1rem;
             box-shadow: 0 0 45px #0001;
             padding: 0 1rem 1rem;
             margin: 0 auto;
@@ -221,7 +223,7 @@
         }
     }
     @media (min-width: 140ch) {.container {grid-template-columns: 42ch 1fr;}}
-    tr > th {
+    th {
         border-bottom: 2px solid var(--olivina);
         padding: 1rem 1ch .5rem;
         position: sticky;
