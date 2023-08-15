@@ -29,7 +29,7 @@
     import type { Complete } from "../types";
 	import Collapsible from "$lib/Collapsible.svelte";
 	import { coniuga } from "../coniugazione";
-    import SinConTag from "./SinCon.svelte";
+    import OneLine from "./OneLine.svelte";
     import DeclinazioneTag from "./Declinazione.svelte";
     import Tempo from "./Tempo.svelte";
 
@@ -56,8 +56,12 @@
 {#if word.descrizione}
     <p class="descrizione">{word.descrizione}</p>
 {/if}
-<SinConTag title="Sinonimi" data={sinonimi} />
-<SinConTag title="Contrari" data={contrari} />
+<OneLine words={sinonimi}>
+    <h3>Sinonimi</h3>
+</OneLine>
+<OneLine words={contrari}>
+    <h3>Contrari</h3>
+</OneLine>
 {#if word.esempi && word.esempi.length}
     <h3>Esempi</h3>
     <table class="esempi">

@@ -1,15 +1,12 @@
 <script lang="ts">
-	import type { SinCon } from "../types";
-
-    export let title: string;
-    export let data: SinCon[];
+    export let words: {parola: string, id: number|null}[];
 </script>
 
-{#if data.length}
+{#if words.length}
     <div>
-        <h3>{title}:</h3>
+        <slot />
         <ul>
-            {#each data as item}
+            {#each words as item}
                 <li>
                     <a 
                         href="/?parola={item.id||item.parola}"
@@ -28,10 +25,6 @@
         align-items: baseline;
         margin-top: 2rem;
     }
-    h3 {
-        font-size: 1.4rem;
-        color: #556B2F;
-    }
     ul {
         list-style: none;
         display: flex;
@@ -48,4 +41,3 @@
         text-decoration: underline dashed var(--olivina);
     }
 </style>
-
