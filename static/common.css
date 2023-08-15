@@ -29,3 +29,8 @@ button, input, textarea {
     font-size: inherit;
     font-family: inherit;
 }
+
+::selection {
+    background-color: var(--olivastro);
+    color: white;
+}
