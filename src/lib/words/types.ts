@@ -1,7 +1,7 @@
 export interface SinCon {
     contrario: boolean;
     parola: string;
-    id: number|string;
+    id: number|null;
 }
 
 export interface Esempio {
