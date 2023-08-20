@@ -4,16 +4,29 @@ export interface SinCon {
     id: number|null;
 }
 
+export interface Collegamento<strict extends boolean> {
+    tipo: number;
+    parola: string;
+    id: number | (strict extends true ? never : null)
+}
+
 export interface Esempio {
     originale: string;
     traduzione: string;
 }
 
 export interface Declinazione {
-    ms?: string;
-    mp?: string;
-    fs?: string;
-    fp?: string;
+    ms: string|null;
+    mp: string|null;
+    fs: string|null;
+    fp: string|null;
+}
+
+export interface StrictDeclinazione extends Declinazione {
+    ms: string;
+    mp: string;
+    fs: string;
+    fp: string;
 }
 
 export enum TipoVerbo {
@@ -31,7 +44,7 @@ export type TempiRaw = [Voci|null, Voci|null, Voci|null, Voci|null, Voci|null, V
 export interface ConiugazioneRaw {
     tipo: TipoVerbo,
     numero: NumeroConiugazione,
-    participio: Declinazione|null,
+    participio: StrictDeclinazione|null,
     gerundio: string|null,
     tempi: TempiRaw|null
 }
@@ -40,7 +53,7 @@ export interface Summary {
     id: number;
     parola: string;
     traduzione: string;
-    funzione: number;
+    funzione: string;
     ordine: number;
     con_descrizione: boolean;
     numero_esempi: number;
@@ -49,11 +62,9 @@ export interface Summary {
 export type Complete = {
     parola: string;
     traduzione: string;
-    funzione_display: string;
     ordine: number;
     descrizione: string|null;
     esempi: Esempio[]|null;
-    sin_con: SinCon[]|null;
 } & (
     {
         funzione: 1|2|3;
@@ -71,7 +82,28 @@ export type Complete = {
         declinazione: null;
         coniugazione: null;
     }
-)
+);
+
+export type CompleteAdmin = Complete & {
+    collegamenti: Collegamento<true>[]|null;
+}
+
+export type CompleteDisplay = Complete & {
+    collegamenti: Collegamento<false>[]|null;
+    funzione_display: string;
+}
+
+
+export interface WordUpdate {
+    parola?: string;
+    traduzione?: string;
+    ordine?: number;
+    descrizione?: string|null;
+    esempi?: Esempio[]|null;
+    declinazione?: Declinazione|null;
+    coniugazione?: Partial<ConiugazioneRaw>|null;
+    sin_con?: number[];
+}
 
 export interface SearchResult {
     id: number|null;

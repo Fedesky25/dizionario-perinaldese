@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
-    import type { SinCon, Declinazione } from "../types";
+    import type { Declinazione } from "../types";
     const tipoVerboNum2Str = ['', ' transitivo', ' intransitivo', ' intransitivo', ' riflessivo', ' impersonale']
-
+    
     function nomeTipoDeclinazione(voci: Declinazione) {
         if(!voci.fs && !voci.fp) {
             if(!voci.mp) return "maschile singolare";
@@ -15,25 +15,18 @@
         }
         return '';
     }
-
-    function splitSinCon(arr: SinCon[]): [sinonimi: SinCon[], contrari: SinCon[]] {
-        const sin: SinCon[] = [];
-        const con: SinCon[] = [];
-        const len = arr.length;
-        for(var i=0; i<len; i++) (arr[i].contrario ? con : sin).push(arr[i]);
-        return [sin, con]
-    }
 </script>
 
 <script lang="ts">
-    import type { Complete } from "../types";
+    import { splitCollegamenti } from "../utils";
+    import type { CompleteDisplay } from "../types";
 	import Collapsible from "$lib/Collapsible.svelte";
 	import { coniuga } from "../coniugazione";
     import OneLine from "./OneLine.svelte";
     import DeclinazioneTag from "./Declinazione.svelte";
     import Tempo from "./Tempo.svelte";
 
-    export let word: Complete;
+    export let word: CompleteDisplay;
 
     let extra_fg = '';
     $: switch(word.funzione) {
@@ -48,7 +41,7 @@
         default:
             extra_fg = '';
     }
-    $: [sinonimi, contrari] = splitSinCon(word.sin_con || []);
+    $: [vedi_anche, sinonimi, contrari] = splitCollegamenti(word.collegamenti || []);
 </script>
 
 <h2>{word.parola} &ndash; {word.traduzione}</h2>
@@ -56,6 +49,9 @@
 {#if word.descrizione}
     <p class="descrizione">{word.descrizione}</p>
 {/if}
+<OneLine words={vedi_anche}>
+    <span class="bold">Vedi anche:</span>
+</OneLine>
 <OneLine words={sinonimi}>
     <h3>Sinonimi</h3>
 </OneLine>
@@ -155,6 +151,9 @@
     }
     .descrizione {
         margin-top: .2rem;
+    }
+    .bold {
+        font-weight: 600;
     }
     .esempi {
         border-collapse: collapse;
