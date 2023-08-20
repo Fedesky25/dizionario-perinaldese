@@ -22,13 +22,12 @@
 
 <!-- svelte-ignore module-script-reactive-declaration -->
 <script lang="ts">
-    export let
-        radice: string,
-        value: string,
-        name: string,
-		id: string|undefined = undefined,
-        disabled = false,
-		readonly = false;
+    export let radice: string;
+	export let value: string;
+	export let name: string;
+	export let id: string|undefined = undefined;
+	export let disabled = false;
+	export let readonly = false;
 	let pre: string;
     let w: number;
 	$: c = value.charCodeAt(0);
@@ -54,7 +53,8 @@
 		{disabled}
 		{readonly}
 		bind:value={value}
-		size={value.length + 1}
+		type="text"
+		size={value.length + 2}
 		autocapitalize="off">
 </label>
 
