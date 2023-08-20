@@ -1,4 +1,4 @@
-import type { Declinazione, NumeroConiugazione, Voci, VociImperative, ConiugazioneRaw } from "./types"
+import type { Declinazione, NumeroConiugazione, Voci, VociImperative, ConiugazioneRaw, StrictDeclinazione } from "./types"
 import { TipoVerbo } from "./types";
 import { formatta } from './utils';
 
@@ -218,7 +218,7 @@ type DesinenzeParticio = [string, string, string, string];
 
 export function onlyPPms(tipo: TipoVerbo) { return tipo === TipoVerbo.intransitivo_avere || tipo === TipoVerbo.impersonale }
 
-const participi_default: [DesinenzeParticio, DesinenzeParticio, DesinenzeParticio, DesinenzeParticio] = [
+export const participi_default: [DesinenzeParticio, DesinenzeParticio, DesinenzeParticio, DesinenzeParticio] = [
     ['üu', 'üi', 'üa', 'üe'],
     ['àu', 'ài', 'àa', 'àe'],
     ['üu', 'üi', 'üa', 'üe'],
@@ -229,7 +229,7 @@ function PPvoce(radice: string, voce: string|undefined, num: NumeroConiugazione,
     return voce ? formatta(radice, voce) : radice + participi_default[num][index];
 }
 
-export function computeParticipio(radice: string, coniu: ConiugazioneRaw): Required<Declinazione> {
+export function computeParticipio(radice: string, coniu: ConiugazioneRaw): StrictDeclinazione {
     const values = coniu.participio;
     const num = coniu.numero;
     if(values) {
