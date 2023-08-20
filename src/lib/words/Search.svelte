@@ -101,7 +101,13 @@
                 <ul>
                     {#each results as word, i}
                         <li>
-                            <button tabindex={-hidden} class="padded" class:active={i === active} data-index={i} on:click={select}>
+                            <button 
+                                tabindex={-hidden} 
+                                type="button"
+                                class="padded" 
+                                class:active={i === active} 
+                                data-index={i} 
+                                on:click={select}>
                                 <span class="lex">{word.parola}</span>
                                 <span class="fgs">{word.funzione}</span>
                                 <span class="tra">{word.traduzione}</span>
@@ -163,6 +169,7 @@
         transition: transform .1s ease-in, opacity .1s ease-in;
         transform: translateX(-50%) scale(0.6);
         opacity: 0;
+        pointer-events: none;
     }
 
     .padded {
