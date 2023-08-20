@@ -31,9 +31,10 @@
     let first_time = true;
     async function searchFor(str: string) {
         if(first_time) return void (first_time = false);
-        const res = await fetch("/admin/dizionario?search="+str, req);
+        const url = "/admin/dizionario?opzione=" + (str ? `cerca&parametro=${str}` : "riassunto");
+        const res = await fetch(url, req);
         words = await res.json();
-        can_extend = words.length === 50;
+        can_extend = str ? false : words.length === 50;
     }
     $: searchFor($search);
     
@@ -41,7 +42,7 @@
     async function extend() {
         if(extending || !can_extend) return;
         extending = true;
-        const res = await fetch(`/admin/dizionario?search=${$search}&skip=${words.length}`, req);
+        const res = await fetch(`/admin/dizionario?opzione=riassunto&parametro=${words.length}`, req);
         const newWords: Summary[] = await res.json();
         can_extend = newWords.length === 50;
         words.push(...newWords);
@@ -85,7 +86,7 @@
         <input type="text" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
             use:debounceInput={{ delay: 500, store: search }}>
-        <a class="btn" href="/admin/dizionario/nuova">Aggiungi parola</a>
+        <a class="btn" href="/admin/dizionario/crea">Aggiungi parola</a>
     </div>
     <div class="table-container">
         <table>
