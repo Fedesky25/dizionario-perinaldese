@@ -31,12 +31,15 @@
     }
     li {
         margin-left: 1.5ch;
+        padding: 0 .2ch;
+        border-bottom: 1px dashed var(--olivina);
     }
     a {
         color: inherit;
         border: none;
         background: transparent;
         cursor: pointer;
-        text-decoration: underline dashed var(--olivina);
+        text-decoration: none;
+        /* text-decoration: underline dashed var(--olivina); */
     }
 </style>
