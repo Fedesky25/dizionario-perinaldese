@@ -9,6 +9,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Pannello admin | Dizionario Perinaldese</title>
+</svelte:head>
+
 <main>
     <h1>Seleziona l'editor</h1>
     <ul>

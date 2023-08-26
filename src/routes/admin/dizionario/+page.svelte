@@ -63,6 +63,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Voci del Dizionario Perinaldese</title>
+</svelte:head>
+
 <div class="container">
     <h1>Voci del dizionario</h1>
     <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo. I risultati della ricerca compaiono man mano che si scrive.</p>
