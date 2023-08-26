@@ -7,6 +7,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Dizionario Perinaldese - login</title>
+</svelte:head>
+
 <div class="center">
     <h1>Login al dizionario perinaldese</h1>
     <form method="POST" use:enhance>
