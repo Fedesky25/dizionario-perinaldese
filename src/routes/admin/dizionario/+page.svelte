@@ -65,7 +65,7 @@
 
 <div class="container">
     <h1>Voci del dizionario</h1>
-    <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo.risultati della ricerca compaiono man mano che si scrive.</p>
+    <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo. I risultati della ricerca compaiono man mano che si scrive.</p>
     <div class="interaction">
         <input type="search" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
@@ -133,7 +133,10 @@
 
 <style>
     :global(html) {overflow: hidden;}
-    :global(body) {overflow: hidden;}
+    :global(body) {
+        overflow: hidden;
+        background-color: #f8f8f8;
+    }
     .container {
         display: grid;
         width: 100%;
