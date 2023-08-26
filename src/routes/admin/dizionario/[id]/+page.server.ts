@@ -251,7 +251,7 @@ export const actions: Actions = {
         const res = await supabase.rpc("aggiorna_collegamenti", collegamenti);
         if(res.error) throw postgresError2HTTPError(res.error);
 
-        if(params.id === "crea") throw redirect(303, "/admin/dizionario");
-        else return { success: true };
+        if(params.id === "crea") return { success: true };
+        else throw redirect(303, "/admin/dizionario");
     }
 };
