@@ -17,7 +17,7 @@ export function getStringOrNull(data: FormData, key: string) {
 }
 
 export function getInt(data: FormData, key: string) {
-    const raw = data.get("key");
+    const raw = data.get(key);
     if(typeof raw !== "string") datoInvalido(`"${key}" deve essere un numero intero`);
     const v = +raw;
     if(!Number.isInteger(v)) datoInvalido(`"${key}" deve essere un numero intero`);
