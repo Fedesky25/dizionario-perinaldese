@@ -89,6 +89,7 @@
 		font-weight: inherit;
 		padding: 0;
 		clip-path: inset(0 0 0 var(--w));
+		color: var(--input-color, inherit);
 	}
 	input:focus {
 		outline: none;
