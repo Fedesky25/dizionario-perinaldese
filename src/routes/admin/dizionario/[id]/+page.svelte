@@ -49,16 +49,22 @@
     </div>
     <div class="body">
         <h1>
-            <span>{data.id ? "Aggiorna" : "Aggiungi"}</span>
-            <select name="funzione" bind:value={funzione}>
-                {#each data.funzioni as fg}
+            <span>
+                {data.id ? "Aggiorna" : "Aggiungi"}
+                <select name="funzione" bind:value={funzione}>
+                    {#each data.funzioni as fg}
                     <option value={fg.id}>{fg.nome}</option>
-                {/each}
-            </select>
-            <input type="text" name="parola" readonly={parola_automatica} bind:value={parola}>
+                    {/each}
+                </select>
+            </span>
+            <span>«<input type="text" 
+                name="parola" 
+                readonly={parola_automatica} 
+                title={parola_automatica ? "La parola viene generata automaticamente" : "Parola"} 
+                size={parola.length+1}
+                bind:value={parola}>»</span>
             {#if parola_automatica}
-                <span>avente radice</span>
-                <input type="text" name="radice" bind:value={radice}>
+                <span>avente radice <input type="text" name="radice" size={radice.length+1} bind:value={radice}></span>
             {/if}
         </h1>
         <Declinazione 
@@ -74,11 +80,11 @@
         <section class="two-cols">
             <div class="named-input">
                 <span>Traduzione:</span>
-                <input type="text" bind:value={traduzione} autocapitalize="off" />
+                <input type="text" name="traduzione" bind:value={traduzione} autocapitalize="off" />
             </div>
             <div class="named-input">
                 <span>Ordine:</span>
-                <select value={word.ordine}>
+                <select value={word.ordine} name="ordine">
                     <option value={0}>Unico</option>
                     <option value={1}>1&ordm;</option>
                     <option value={2}>2&ordm;</option>
@@ -107,15 +113,39 @@
 <style>
     :global(body) {
         overflow-y: scroll;
+        background-color: white;
+    }
+    h1 {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
     }
 
     input, select,
     :global(textarea) {
         border: 1px solid #ccc;
-        border-radius: .3rem;
+        border-radius: .2rem;
         padding: .3rem .6rem;
         font: inherit;
         background-color: white;
+    }
+    input:focus, select:focus,
+    :global(textarea:focus) {
+        border-color: var(--olivina);
+        outline: none;
+    }
+
+    h1 input {
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px dashed #ccc;
+    }
+    input[name="parola"] {
+        text-align: center;
+    }
+    input[name="parola"]:read-only {
+        border-bottom-style: dashed;
+        color: #444;
     }
     button {
         font-size: 1.1rem;
@@ -143,6 +173,9 @@
         margin-right: 1ch;
     }
     @media (min-width: 50rem) {
+        h1 {
+            align-items: center;
+        }
         form {
             display: grid;
             grid-template-columns: 1fr minmax(40ch, 80ch) 1fr;
