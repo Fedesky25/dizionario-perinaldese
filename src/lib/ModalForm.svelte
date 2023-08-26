@@ -1,6 +1,6 @@
 <script lang="ts">
     // import { page } from "$app/stores";
-	import { createEventDispatcher, onMount } from "svelte";
+	import { onMount } from "svelte";
     import { enhance } from "$app/forms";
     import type { ActionResult, SubmitFunction } from "@sveltejs/kit";
 
@@ -8,12 +8,17 @@
     export let hashRegExp: RegExp;
     export let action: string;
 
-    const dispatch = createEventDispatcher<{
-        result: {
-            regexp: RegExpExecArray,
-            action: ActionResult
-        } 
-    }>();
+    type UpdateFormFunction = (options?: {reset: boolean;} | undefined) => Promise<void>;
+    type OnResultType = (array: RegExpExecArray, update: UpdateFormFunction) => void|Promise<void>;
+
+    export let onresult: undefined | ((
+        regexp: RegExpExecArray, 
+        action: ActionResult, 
+        update: UpdateFormFunction
+    ) => void|Promise<void>) = undefined;
+    export let onsuccess: OnResultType |undefined = undefined;
+    export let onfail: OnResultType | undefined = undefined
+
 
     let confirming = false;
     let arr: RegExpExecArray|null = null;
@@ -51,8 +56,15 @@
     function syncWithHash() { arr = hashRegExp.exec(window.location.hash); }
     onMount(syncWithHash);
 
-    const afterResponse: ReturnType<SubmitFunction> = ({ result }) => {
-        dispatch("result", { regexp: arr!, action: result });
+    const afterResponse: ReturnType<SubmitFunction> = async ({ result, update }) => {
+        let res: void | Promise<void>;
+        if(onresult) res = onresult(arr!, result, update);
+        else {
+            if(result.type === "success" && onsuccess) res = onsuccess(arr!, update);
+            else if(result.type === "failure" && onfail) res = onfail(arr!, update);
+            else res = update();
+        }
+        if(res instanceof Promise) await res;
         confirming = false;
         exit();
     }
