@@ -4,7 +4,13 @@
 
 <div>
     <h1>{$page.status}</h1>
-    <p>{$page.error?.message}</p>
+    <p>
+        {#if $page.error?.details}
+        <span class="semibold">{$page.error?.message}</span>: {$page.error?.details}
+        {:else}
+        {$page.error?.message}
+        {/if}
+    </p>
     <a href="/admin/dizionario">Torna indietro</a>
 </div>
 
@@ -41,6 +47,9 @@
         word-wrap: break-word;
         max-width: 100%;
         text-align: center;
+    }
+    .semibold {
+        font-weight: 550;
     }
     a {
         display: inline-block;
