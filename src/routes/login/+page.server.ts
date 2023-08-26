@@ -10,8 +10,8 @@ export const actions: Actions = {
         const password = data.get("password");
         if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
             await authorize(cookies);
-            const goto = url.searchParams.get("redirect") || "/admin";
-            throw redirect(303, goto);
+            const goto = url.searchParams.get("redirect");
+            throw redirect(303, goto !== null && goto.startsWith("/") ? goto : "/admin");
         } else {
             return fail(400, {error: true});
         }
