@@ -51,32 +51,15 @@
         extending = false;
     }
 
-    let descrizione = '';
-    async function changeDescription(arr: RegExpExecArray) {
-        const id = arr[1];
-        const res = await fetch("/admin/dizionario/"+id, {
-            credentials: "include",
-            redirect: "follow",
-            method: "PUT",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({descrizione})
-        });
-        if(res.ok) words[+arr[2]].con_descrizione = true; 
-        descrizione = '';
+    function addDescrizione(re: RegExpExecArray) {
+        const index = +re[2];
+        words[index].con_descrizione = true;
     }
-    async function removeWord(arr: RegExpExecArray) {
-        const id = arr[1];
-        const res = await fetch("/admin/dizionario/"+id, {
-            credentials: "include",
-            redirect: "follow",
-            method: "DELETE",
-        });
-        const { deleted } = await res.json();
-        if(deleted) {
-            const index = +arr[2];
-            words.splice(index, 1);
-            words = words;
-        }
+
+    function rimuoviParola(re: RegExpExecArray) {
+        const index = +re[2];
+        words.splice(index, 1);
+        words = words;
     }
 </script>
 
@@ -122,14 +105,14 @@
     encourage={true}
     action="?/descrizione"
     hashRegExp={/#descrizione\/(\d+)\/(\d+)/}
+    onsuccess={addDescrizione}
     let:data let:titleID let:descID
 >
     {#if words.length}
-
     {@const w = words[+data[2]]}
     <h2 id={titleID}>Aggiungi una descrizione</h2>
     <p id={descID}>La voce «{w.parola} - {w.traduzione}» non ha una descrizione: scrivila al volo qui sotto.</p>
-    <textarea cols="30" rows="6" name="descrizione" bind:value={descrizione} on:keydown={handleSpecialChars}></textarea>
+    <textarea cols="30" rows="6" name="descrizione" on:keydown={handleSpecialChars}></textarea>
     <input type="hidden" name="id" value={data[1]}>
     {/if}
 </ModalForm>
@@ -138,6 +121,7 @@
     encourage={false} 
     action="?/rimuovi"
     hashRegExp={/#rimuovi\/(\w+)\/(\d+)/}
+    onsuccess={rimuoviParola}
     let:titleID let:descID let:data>
     {#if words.length}
     {@const w = words[+data[2]]}
@@ -252,7 +236,19 @@
         max-height: 4rem;
         width: auto;
     }
-    textarea {width: 100%;}
+    textarea {
+        padding: .5rem 1rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: .3rem;
+        resize: vertical;
+        min-height: 6rem;
+        max-height: 50vh;
+    }
+    textarea:focus {
+        outline: none;
+        border-color: var(--olivina);
+    }
 
     input, .btn {
         padding: .5rem 1rem;
