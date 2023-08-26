@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { handleSpecialChars } from "$lib/words/utils";
     import { debounceInput } from "$lib/timing";
+	import ModalForm from "$lib/ModalForm.svelte";
 	import type { PageData } from "./$types";
-    import Modal from "$lib/Modal.svelte";
     import Voce from "./Voce.svelte";
 	import { writable } from "svelte/store";
 	import type { Summary } from "$lib/words/types";
+	import Loading from "$lib/Loading.svelte";
 
     export let data: PageData;
     let words: Summary[] = data.words;
@@ -83,7 +84,7 @@
     <h1>Voci del dizionario</h1>
     <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo.risultati della ricerca compaiono man mano che si scrive.</p>
     <div class="interaction">
-        <input type="text" placeholder="Cerca..." 
+        <input type="search" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
             use:debounceInput={{ delay: 500, store: search }}>
         <a class="btn" href="/admin/dizionario/crea">Aggiungi parola</a>
@@ -107,34 +108,44 @@
                 <span>Nessun risultato di ricerca</span>
             </div>
         {/if}
-        {#if can_extend}
-            <button class="btn" disabled={extending} on:click={extend}>Carica altri</button>
+        {#if extending}
+            <div class="load-wrapper">
+                <Loading />
+            </div>
+        {:else if can_extend}
+            <button class="btn" type="button" disabled={extending} on:click={extend}>Carica altri</button>
         {/if}
     </div>
 </div>
 
-<Modal 
-    encourage={true} action={changeDescription}
-    hashRegExp={/#descrizione\/(\w+)\/(\d+)/}
-    let:data let:titleID let:descID>
+<ModalForm
+    encourage={true}
+    action="?/descrizione"
+    hashRegExp={/#descrizione\/(\d+)\/(\d+)/}
+    let:data let:titleID let:descID
+>
     {#if words.length}
-    {@const w = words[+(data[2]||0)]}
+
+    {@const w = words[+data[2]]}
     <h2 id={titleID}>Aggiungi una descrizione</h2>
     <p id={descID}>La voce «{w.parola} - {w.traduzione}» non ha una descrizione: scrivila al volo qui sotto.</p>
-    <textarea cols="30" rows="6" bind:value={descrizione} on:keydown={handleSpecialChars}></textarea>
+    <textarea cols="30" rows="6" name="descrizione" bind:value={descrizione} on:keydown={handleSpecialChars}></textarea>
+    <input type="hidden" name="id" value={data[1]}>
     {/if}
-</Modal>
+</ModalForm>
 
-<Modal 
-    encourage={false} action={removeWord}
+<ModalForm 
+    encourage={false} 
+    action="?/rimuovi"
     hashRegExp={/#rimuovi\/(\w+)\/(\d+)/}
     let:titleID let:descID let:data>
     {#if words.length}
-    {@const w = words[+(data[2]||0)]}
+    {@const w = words[+data[2]]}
     <h2 id={titleID}>Rimozione «{w.parola}»</h2>
     <p id={descID}>Sei sicuro di voler rimuovere la voce «{w.parola} - {w.traduzione}»?<br>L'operazione non potrà essere annullata.</p>
+    <input type="hidden" name="id" value={data[1]}>
     {/if}
-</Modal>
+</ModalForm>
 
 <style>
     :global(html) {overflow: hidden;}
@@ -242,18 +253,37 @@
         width: auto;
     }
     textarea {width: 100%;}
+
+    input, .btn {
+        padding: .5rem 1rem;
+        border-radius: .2rem;
+        font-weight: 500;
+        border: none;
+    }
+    input {
+        box-shadow: inset 0 0 0 1px #ccc;
+    }
+    input:focus {
+        box-shadow: inset 0 0 0 1px var(--olivina);
+        outline: none;
+    }
     .btn {
         background-color: var(--olivina);
         font-size: 1rem;
-        font-weight: 500;
-        border: none;
-        border-radius: .2rem;
         color: white;
-        padding: .5rem 1rem;
         cursor: pointer;
     }
     button {
         display: block;
         margin: 2rem auto;
+    }
+    .load-wrapper {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        --loading-width: 30ch;
     }
 </style>
