@@ -24,7 +24,7 @@ export const actions: Actions = {
         if(res.error) throw postgresError2HTTPError(res.error);
         return { success: true }
     },
-    rimozione: async ({ request }) => {
+    rimuovi: async ({ request }) => {
         const data = await request.formData();
         const id = getInt(data, "id");
         const res = await supabase.from("parole").delete().eq("id",id);
