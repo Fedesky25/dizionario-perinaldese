@@ -8,6 +8,17 @@ export function formatta(radice: string, valore: string) {
     }
 }
 
+export function eq(suffix: string, value: string) {
+    const len = value.length;
+    if(suffix.length !== len+1) return false;
+    for(var i=0; i<len; i++) {
+        if(suffix.charCodeAt(i+1) !== value.charCodeAt(i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export const summary_projection = {
     _id: 1,
     parola: 1,
