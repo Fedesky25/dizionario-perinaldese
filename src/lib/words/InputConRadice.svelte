@@ -28,6 +28,7 @@
 	export let id: string|undefined = undefined;
 	export let disabled = false;
 	export let readonly = false;
+	export let underline = true;
 	let pre: string;
     let w: number;
 	$: c = value.charCodeAt(0);
@@ -46,7 +47,7 @@
     }
 </script>
 
-<label class="input-like" style="--w: {w}em;" class:disabled>
+<label class="input-like" class:underline style="--w: {w}em;" class:disabled>
 	<span>{pre}</span>
     <input
         {name} {id}
@@ -54,8 +55,9 @@
 		{readonly}
 		bind:value={value}
 		type="text"
-		size={value.length + 2}
-		autocapitalize="off">
+		size={value.length + 1}
+		autocapitalize="off"
+		autocomplete="off">
 </label>
 
 <style>
@@ -65,6 +67,14 @@
         align-items: baseline;
 	}
 	label.disabled {cursor: not-allowed;}
+	.underline {
+		padding: 0 .2ch;
+		border-bottom: 1px dashed #ccc;
+		margin-bottom: -1px;
+	}
+	.underline:focus-within {
+		border-color: var(--olivina);
+	}
 	span {
 		color: #999;
 		margin-right: calc(0px - var(--w));
