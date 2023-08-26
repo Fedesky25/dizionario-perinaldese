@@ -81,7 +81,7 @@ const imperativo_default: ConiugazioneImperativo = {
     ]
 }
 
-enum OperazioneConiugazione { normal, del_I, del_H, add_H };
+export enum OperazioneConiugazione { normal, del_I, del_H, add_H };
 
 interface Indicativo {
     presente: Voci,
@@ -115,6 +115,10 @@ function startsWithVowel(s: string) {
     return s[0] == 'a' || s[0] == 'e' || s[0] == 'i' || s[0] == 'o' || s[0] == 'u';
 }
 
+function startsWithTheseChars(s: string, c1: string, c2: string) {
+    return s[0] === c1 || s[0] === c2;
+}
+
 function singolo(radice: string, desinenza: string, operazione: OperazioneConiugazione) {
     switch(operazione) {
         case OperazioneConiugazione.del_I:
@@ -130,16 +134,71 @@ function singolo(radice: string, desinenza: string, operazione: OperazioneConiug
     return radice + desinenza;
 }
 
+export type IndiceTempo = 0|1|2|3|4|5;
+
+export function getOperazioneConiugazione(radice: string, numero: NumeroConiugazione) {
+    if(numero == 1) {
+        if(radice.endsWith('ci') || radice.endsWith('gi')) return OperazioneConiugazione.del_I;
+        if(radice.endsWith('c') || radice.endsWith('g')) return OperazioneConiugazione.add_H;
+    } 
+    else if(radice.endsWith('ch') || radice.endsWith('gh')) return OperazioneConiugazione.del_H;
+    return OperazioneConiugazione.normal;
+}
+
+export function getDefaultTempo(tempo: IndiceTempo, numero: NumeroConiugazione, operazione: OperazioneConiugazione) {
+    const base = (tempo === 0 || tempo == 1) ? (
+        numero === 2
+        ? coniugazione_default[tempo].seconda
+        : coniugazione_default[tempo].altro
+    ) : coniugazione_default[tempo];
+    const res = new Array<string>(6) as Voci;
+    switch(operazione) {
+        case OperazioneConiugazione.del_I:
+            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(base[i], 'e', 'i') ? '<' : '|') + base[i];
+            break;
+        case OperazioneConiugazione.del_H:
+            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(base[i], 'a', 'u') ? '<' : '|') + base[i];
+            break;
+        case OperazioneConiugazione.add_H:
+            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(base[i], 'e', 'i') ? '|h' : '|') + base[i];
+            break;
+        default:
+            for(var i=0; i<6; i++) res[i] = '|' + base[i];
+            break;
+    }
+    return res;
+}
+
+function coniugaDefaultTempo(tempo: IndiceTempo, numero: NumeroConiugazione, operazione: OperazioneConiugazione, radice: string) {
+    const base = (tempo === 0 || tempo == 1) ? (
+        numero === 2
+        ? coniugazione_default[tempo].seconda
+        : coniugazione_default[tempo].altro
+    ) : coniugazione_default[tempo];
+    const res = new Array<string>(6) as Voci;
+    const cutted = radice.slice(0,-1);
+    switch(operazione) {
+        case OperazioneConiugazione.del_I:
+            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(base[i], 'e', 'i') ? cutted : radice) + base[i];
+            break;
+        case OperazioneConiugazione.del_H:
+            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(base[i], 'a', 'u') ? cutted : radice) + base[i];
+            break;
+        case OperazioneConiugazione.add_H:
+            for(var i=0; i<6; i++) res[i] = radice + (startsWithTheseChars(base[i], 'e', 'i') ? 'h' : '') + base[i];
+            break;
+        default:
+            for(var i=0; i<6; i++) res[i] = radice + base[i];
+            break;
+    }
+    return res;
+}
 
 export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugazione {
     const num = coniugazione.numero
     const tipo = coniugazione.tipo;
     const values = coniugazione.tempi || [];
-    let operazione = OperazioneConiugazione.normal;
-    if(num == 1) {
-        if(radice.endsWith('ci') || radice.endsWith('gi')) operazione = OperazioneConiugazione.del_I;
-        else if(radice.endsWith('c') || radice.endsWith('g')) operazione = OperazioneConiugazione.add_H;
-    } else if(radice.endsWith('ch') || radice.endsWith('gh')) operazione = OperazioneConiugazione.del_H;
+    const operazione = getOperazioneConiugazione(radice, num);
 
     const femminile = Math.random() > 0.5;
     const soggetti = femminile ? pronomi.maschili : pronomi.femminili;
@@ -171,7 +230,7 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
         imperativo: imperativo()
     }
 
-    function semplice(t: 0|1|2|3|4|5) {
+    function semplice(t: IndiceTempo) {
         let res: string[];
         const voce = values[t]
         if(voce && voce.length === 6) {
@@ -179,11 +238,7 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
             if(tipo === TipoVerbo.riflessivo) res = res.map((v,i) => complementi[i] + (startsWithVowel(v) ? "'" : "e ") + v);
             else if(startsWithVowel(res[2])) res[2] = "l'" + res[2];
         } else {
-            if(t === 0 || t === 1) {
-                if(num === 2) res = coniugazione_default[t].seconda;
-                else res = coniugazione_default[t].altro;
-            } else res = coniugazione_default[t];
-            res = res.map(v => singolo(radice, v, operazione));
+            res = coniugaDefaultTempo(t, num, operazione, radice);
             if(tipo === TipoVerbo.riflessivo) {
                 if(startsWithVowel(radice)) res = res.map((v,i) => complementi[i] + "'" + v);
                 else res = res.map((v,i) => complementi[i] + 'e ' + v);
@@ -192,7 +247,7 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
         return res.map((v,i) => soggetti.normali[i] + " " + v) as Voci;
     }
 
-    function composto(t: 0|1|2|3|4|5) {
+    function composto(t: IndiceTempo) {
         let i: number;
         const res: string[] = new Array(6);
         for(i=0; i<3; i++) res[i] = soggetti.normali[i] + ' ' + ausiliare[t][i] + ' ' + desinenzaPP[0];
