@@ -81,6 +81,7 @@
             disabled={funzione !== 4}
             radice={radice}
             data={word.coniugazione||emptyConiugazione()}
+            on:parola={e => {parola = e.detail}}
         />
         <section class="two-cols">
             <div class="named-input">

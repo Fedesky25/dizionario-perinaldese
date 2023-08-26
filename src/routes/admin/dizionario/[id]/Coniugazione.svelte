@@ -1,8 +1,9 @@
 <script lang="ts">
     import Collapsible from "$lib/Collapsible.svelte";
     import InputConRadice from "$lib/words/InputConRadice.svelte";
-	import { getDefaultTempo, getOperazioneConiugazione } from "$lib/words/coniugazione";
+	import { computeInfinito, getDefaultTempo, getOperazioneConiugazione } from "$lib/words/coniugazione";
 	import { TipoVerbo, type ConiugazioneRaw } from "$lib/words/types";
+	import { createEventDispatcher } from "svelte";
 	import Participio from "./Participio.svelte";
 	import Tempo from "./Tempo.svelte";
 
@@ -10,9 +11,12 @@
     export let disabled = false;
     export let data: ConiugazioneRaw;
 
+    const dispatch = createEventDispatcher<{parola: string}>();
+
     $: avere = data.tipo === TipoVerbo.intransitivo_avere || data.tipo === TipoVerbo.impersonale;
     $: riflessivo = data.tipo === TipoVerbo.riflessivo;
     $: operazione = getOperazioneConiugazione(radice, data.numero);
+    $: !disabled && dispatch("parola", computeInfinito(radice, data.numero, riflessivo));
 </script>
 
 <fieldset {disabled}>
@@ -38,9 +42,7 @@
     <Participio {radice} 
         numero={data.numero} 
         single={avere} 
-        data={data.participio}
-        calcParola={!disabled}
-        on:parola />
+        data={data.participio} />
     <div class="space"></div>
     <Collapsible>
         <h3 slot="title">Tempi verbali</h3>

@@ -2,6 +2,11 @@ import type { Declinazione, NumeroConiugazione, Voci, VociImperative, Coniugazio
 import { TipoVerbo } from "./types";
 import { formatta } from './utils';
 
+const suffissi_infinito = {
+    normale: ['ê', 'â', 'ê', 'î'], 
+    riflessivo: ['esse', 'asse', 'esse', 'isse']
+}
+
 const pronomi = {
     maschili: {
         normali: ['mi a', 'tü ti', 'elu u', 'nui a', 'vui u', 'eli i'],
@@ -109,6 +114,10 @@ interface Coniugazione {
     congiuntivo: Congiuntivo,
     condizionale: Condizionale,
     imperativo: VociImperative
+}
+
+export function computeInfinito(radice: string, numero: NumeroConiugazione, riflessivo: boolean) {
+    return radice + (riflessivo ? suffissi_infinito.riflessivo : suffissi_infinito.normale)[numero];
 }
 
 function startsWithVowel(s: string) {
