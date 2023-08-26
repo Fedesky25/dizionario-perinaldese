@@ -1,6 +1,6 @@
 import type { PageServerLoad } from "./$types";
 import { supabase } from "$lib/db";
-import type { Complete } from "$lib/words/types";
+import type { CompleteDisplay } from "$lib/words/types";
 
 export const load: PageServerLoad = async ({ url }) => {
     const parola = url.searchParams.get("parola");
@@ -32,6 +32,6 @@ export const load: PageServerLoad = async ({ url }) => {
             : "'"+parola+"'"
         )
     }
-    const words: Complete[] = res.data;
+    const words: CompleteDisplay[] = res.data;
     return { code: 200, words, error: null };
 };
