@@ -12,6 +12,7 @@
     export let radice: string;
     export let numero: number;
     export let data: StrictDeclinazione|null;
+    export let calcParola: boolean;
 
     $: default_values = participi_default[numero];
     $: default_values && update_defaults();
@@ -32,7 +33,7 @@
     }
     function update_defaults() { if(in_default) set_defaults(); }
 
-    $: dispatch("parola", formatta(radice, ms||fs||mp||fp));
+    $: calcParola && dispatch("parola", formatta(radice, ms||fs||mp||fp));
 
     $: in_default = eq(ms,default_values[0]) && (
         single || (

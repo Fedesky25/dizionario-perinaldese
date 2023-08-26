@@ -39,6 +39,7 @@
         numero={data.numero} 
         single={avere} 
         data={data.participio}
+        calcParola={!disabled}
         on:parola />
     <div class="space"></div>
     <Collapsible>
