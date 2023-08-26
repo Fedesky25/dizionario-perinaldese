@@ -2,17 +2,12 @@
 	import InputConRadice from "$lib/words/InputConRadice.svelte";
 	import { participi_default } from "$lib/words/coniugazione";
 	import type { StrictDeclinazione } from "$lib/words/types";
-	import { formatta, eq } from "$lib/words/utils";
-
-    import { createEventDispatcher } from "svelte";
-
-    const dispatch = createEventDispatcher<{parola: string}>();
+	import { eq } from "$lib/words/utils";
 
     export let single: boolean;
     export let radice: string;
     export let numero: number;
     export let data: StrictDeclinazione|null;
-    export let calcParola: boolean;
 
     $: default_values = participi_default[numero];
     $: default_values && update_defaults();
@@ -32,8 +27,6 @@
         fp = '|' + default_values[3];
     }
     function update_defaults() { if(in_default) set_defaults(); }
-
-    $: calcParola && dispatch("parola", formatta(radice, ms||fs||mp||fp));
 
     $: in_default = eq(ms,default_values[0]) && (
         single || (
