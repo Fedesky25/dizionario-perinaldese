@@ -40,11 +40,30 @@
 <input type="hidden" name="coniugazione" value="NULL" disabled={!disabled}>
 
 <style>
+    fieldset {
+        display: grid;
+        row-gap: 1rem;
+        column-gap: 1ch;
+        max-width: 70ch;
+        margin: 2rem auto;
+        border: 1px solid #ccc;
+        padding: 1rem;
+    }
 
     fieldset:disabled,
     input[type="hidden"] {
         position: absolute;
         transform: scale(0);
         opacity: 0;
+    }
+    .info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1ch;
+        row-gap: .4rem;
+        justify-items: start;
+    }
+    .info label {
+        justify-self: end;
     }
 </style>
