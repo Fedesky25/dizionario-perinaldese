@@ -133,7 +133,7 @@
         max-width: 90vw;
         max-height: 90vh;
         overflow-y: auto;
-        border-radius: .6rem;
+        border-radius: 1rem;
         padding: 1.4rem;
         padding-top: 1rem;
         background-color: white;
@@ -149,6 +149,11 @@
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
+    .btns {
+        margin-top: 1.4rem;
+        display: flex;
+        justify-content: right;
+    }
     button {
         border: 2px solid var(--olivina);
         border-radius: .3rem;
@@ -156,6 +161,8 @@
         color: var(--olivina);
         background-color: white;
         cursor: pointer;
+        font-weight: 500;
+        margin-left: 1.4rem;
     }
     button.fill {
         background-color: var(--olivina);
