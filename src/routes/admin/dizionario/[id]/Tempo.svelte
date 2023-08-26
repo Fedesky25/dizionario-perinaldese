@@ -25,7 +25,7 @@
     $: set_v(values, defaults);
 
     function keyup(e: KeyboardEvent) {
-        if(!e.ctrlKey || e.key !== "d") return;
+        if(!e.altKey || !e.ctrlKey || e.key !== "d") return;
         e.preventDefault();
         _v = Array.from(defaults) as Voci;
     }
