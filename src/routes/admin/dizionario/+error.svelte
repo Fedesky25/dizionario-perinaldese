@@ -1,5 +1,8 @@
-<script>
+<script lang="ts">
     import { page } from '$app/stores';
+
+    let reload: boolean;
+    $: reload = $page.url.pathname === "/admin/dizionario"
 </script>
 
 <div>
@@ -11,7 +14,10 @@
         {$page.error?.message}
         {/if}
     </p>
-    <a href="/admin/dizionario">Torna indietro</a>
+    <a 
+        href="/admin/dizionario" 
+        data-sveltekit-reload={reload ? true : undefined}
+    >Torna indietro</a>
 </div>
 
 <style>
