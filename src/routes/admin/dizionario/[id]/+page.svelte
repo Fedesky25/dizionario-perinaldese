@@ -5,13 +5,25 @@
     import Collegamenti from "./Collegamenti.svelte";
     import Esempi from "./Esempi.svelte";
     import { emptyConiugazione, splitCollegamenti } from "$lib/words/utils";
+	import type { CompleteAdmin } from "$lib/words/types";
 
     export let data: PageData;
-    let word = data.parola;
-    let parola = word.parola;
-    let radice = word.radice||"";
-    let traduzione = word.traduzione;
-    let funzione = word.funzione;
+
+    let word: CompleteAdmin;
+    let parola: string;
+    let radice: string;
+    let traduzione: string;
+    let funzione: number;
+
+    function destructureWord(w: CompleteAdmin) {
+        word = w;
+        parola = w.parola;
+        radice = w.radice||"";
+        traduzione = word.traduzione;
+        funzione = word.funzione;
+    }
+
+    $: destructureWord(data.parola);
     $: valid = parola && traduzione && (
         (funzione < 4 && word.declinazione) ||
         (funzione === 4 && word.coniugazione) ||
