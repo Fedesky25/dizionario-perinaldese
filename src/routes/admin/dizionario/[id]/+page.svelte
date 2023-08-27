@@ -8,6 +8,7 @@
 	import type { CompleteAdmin } from "$lib/words/types";
 
     export let data: PageData;
+    const fgs = data.funzioni;
 
     let word: CompleteAdmin;
     let parola: string;
@@ -19,16 +20,16 @@
         word = w;
         parola = w.parola;
         radice = w.radice||"";
-        traduzione = word.traduzione;
-        funzione = word.funzione;
+        traduzione = w.traduzione;
+        funzione = w.funzione;
     }
 
     $: destructureWord(data.parola);
-    $: valid = parola && traduzione && (
-        (funzione < 4 && word.declinazione) ||
-        (funzione === 4 && word.coniugazione) ||
-        funzione > 4
-    );
+    $: valid = parola && traduzione; // && (
+    //     (funzione < 4 && word.declinazione) ||
+    //     (funzione === 4 && word.coniugazione) ||
+    //     funzione > 4
+    // );
     $: parola_automatica = funzione <= 4;
     $: [vedi_anche, sinonimi, contrari] = splitCollegamenti(word.collegamenti||[]);
 </script>
@@ -68,7 +69,7 @@
             <span>
                 {data.id ? "Aggiorna" : "Aggiungi"}
                 <select name="funzione" bind:value={funzione}>
-                    {#each data.funzioni as fg}
+                    {#each fgs as fg}
                     <option value={fg.id}>{fg.nome}</option>
                     {/each}
                 </select>
