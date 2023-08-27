@@ -19,6 +19,23 @@ const pronomi = {
 }
 const complementi: Voci = ['m', 't', 's', 's', 'v', 's'];
 
+export function getPronomiBase(riflessivo: boolean, imperativo: boolean) {
+    const base = (
+        Math.random() > .5 
+        ? pronomi.maschili 
+        : pronomi.femminili
+    )[
+        imperativo 
+        ? "imperativi"
+        : "normali"
+    ];
+    return (
+        riflessivo 
+        ? base.map((v,i) => `${v} ${complementi[i]}e`)
+        : Array.from(base)
+    ) as readonly string[];
+}
+
 type Ausiliare = [Voci, Voci, Voci, Voci, Voci, Voci];
 const ausiliari: {avere: Ausiliare, essere: Ausiliare, riflessivo: Ausiliare} = {
     avere: [
@@ -154,7 +171,7 @@ export function getOperazioneConiugazione(radice: string, numero: NumeroConiugaz
     return OperazioneConiugazione.normal;
 }
 
-function getDefaultSuffissi(tempo: IndiceTempo, numero: NumeroConiugazione) {
+export function getDefaultSuffissi(tempo: IndiceTempo, numero: NumeroConiugazione) {
     return (tempo === 0 || tempo == 1) ? (
         numero === 2
         ? coniugazione_default[tempo].seconda
@@ -162,7 +179,13 @@ function getDefaultSuffissi(tempo: IndiceTempo, numero: NumeroConiugazione) {
     ) : coniugazione_default[tempo];
 }
 
-function operateWithSuffix<T extends string[]>(operazione: OperazioneConiugazione, arr: T): T {
+export function getDefaultSuffissiImperativo(riflessivo: boolean, numero: NumeroConiugazione) {
+    return riflessivo 
+    ? imperativo_default.riflessivo[numero-1]
+    : imperativo_default.attivo[numero-1]
+}
+
+export function operateWithSuffix<T extends string[]>(operazione: OperazioneConiugazione, arr: T): T {
     const res = new Array<string>(arr.length) as T;
     switch(operazione) {
         case OperazioneConiugazione.del_I:
@@ -181,7 +204,7 @@ function operateWithSuffix<T extends string[]>(operazione: OperazioneConiugazion
     return res;
 }
 
-function operateWithRadice<T extends string[]>(radice: string, operazione: OperazioneConiugazione, arr: T): T {
+export function operateWithRadice<T extends string[]>(radice: string, operazione: OperazioneConiugazione, arr: T): T {
     const res = new Array<string>(arr.length);
     const cutted = radice.slice(0,-1);
     switch(operazione) {
@@ -270,10 +293,7 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
         if(values[6] && values[6].length === 5) {
             return values[6].map((v,i) => soggetti.imperativi[i] + ' ' + formatta(radice, v)) as VociImperative;
         } else {
-            const base = tipo === TipoVerbo.riflessivo 
-            ? imperativo_default.riflessivo[num-1]
-            : imperativo_default.attivo[num-1];
-            const res = operateWithRadice(radice, operazione, base);
+            const res = operateWithRadice(radice, operazione, getDefaultSuffissiImperativo(tipo === TipoVerbo.riflessivo, num));
             for(var i=0; i<5; i++) res[i] = soggetti.imperativi[i] + ' ' + res[i];
             return res;
         }

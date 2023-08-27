@@ -1,7 +1,7 @@
 <script lang="ts">
     import Collapsible from "$lib/Collapsible.svelte";
     import InputConRadice from "$lib/words/InputConRadice.svelte";
-	import { computeInfinito, getDefaultTempo, getOperazioneConiugazione } from "$lib/words/coniugazione";
+	import { computeInfinito, getPronomiBase, getOperazioneConiugazione, operateWithSuffix, getDefaultSuffissi, getDefaultSuffissiImperativo } from "$lib/words/coniugazione";
 	import { TipoVerbo, type ConiugazioneRaw } from "$lib/words/types";
 	import { createEventDispatcher } from "svelte";
 	import Participio from "./Participio.svelte";
@@ -17,6 +17,8 @@
     $: riflessivo = data.tipo === TipoVerbo.riflessivo;
     $: operazione = getOperazioneConiugazione(radice, data.numero);
     $: !disabled && dispatch("parola", computeInfinito(radice, data.numero, riflessivo));
+    $: soggetti = getPronomiBase(riflessivo, false);
+    $: soggetti_imp = getPronomiBase(riflessivo, true);
 </script>
 
 <fieldset {disabled}>
@@ -47,12 +49,15 @@
     <Collapsible>
         <h3 slot="title">Tempi verbali</h3>
         <div class="tempi">
-            <Tempo index={0} {riflessivo} {radice} values={data.tempi?.[0] || null} defaults={getDefaultTempo(0, data.numero, operazione)} />
-            <Tempo index={1} {riflessivo} {radice} values={data.tempi?.[1] || null} defaults={getDefaultTempo(1, data.numero, operazione)} />
-            <Tempo index={2} {riflessivo} {radice} values={data.tempi?.[2] || null} defaults={getDefaultTempo(2, data.numero, operazione)} />
-            <Tempo index={3} {riflessivo} {radice} values={data.tempi?.[3] || null} defaults={getDefaultTempo(3, data.numero, operazione)} />
-            <Tempo index={4} {riflessivo} {radice} values={data.tempi?.[4] || null} defaults={getDefaultTempo(4, data.numero, operazione)} />
-            <Tempo index={5} {riflessivo} {radice} values={data.tempi?.[5] || null} defaults={getDefaultTempo(5, data.numero, operazione)} />
+            {#each {length: 6} as _, i}
+            <Tempo index={i} {radice} {soggetti} 
+                values={data.tempi?.[i] || null} 
+                defaults={operateWithSuffix(operazione, getDefaultSuffissi(i, data.numero))} />
+            {/each}
+            <Tempo index={6} {radice} 
+                soggetti={soggetti_imp} 
+                values={data.tempi?.[5] || null} 
+                defaults={operateWithSuffix(operazione, getDefaultSuffissiImperativo(riflessivo, data.numero))} />
         </div>
     </Collapsible>
 </fieldset>

@@ -5,29 +5,28 @@
         "Indicativo Futuro",
         "Congiuntivo Presente",
         "Congiuntivo Imperfetto",
-        "Condizionale Presente"
+        "Condizionale Presente",
+        "Imperativo"
     ];
 </script>
 
 <script lang="ts">
     import InputConRadice from '$lib/words/InputConRadice.svelte';
-    import type { Voci } from '$lib/words/types';
-    import type { IndiceTempo } from '$lib/words/coniugazione';
 
     export let radice: string;
-    export let index: IndiceTempo;
-    export let defaults: Voci;
-    export let values: Voci|null;
-    export let riflessivo: boolean;
+    export let index: number;
+    export let soggetti: readonly string[];
+    export let defaults: string[];
+    export let values: string[]|null;
 
-    let _v: Voci;
-    function set_v(values: Voci|null, defaults: Voci) { _v = values || (Array.from(defaults) as Voci); }
+    let _v: string[];
+    function set_v(values: string[]|null, defaults: string[]) { _v = values || (Array.from(defaults)); }
     $: set_v(values, defaults);
 
     function keyup(e: KeyboardEvent) {
         if(!e.altKey || !e.ctrlKey || e.key !== "d") return;
         e.preventDefault();
-        _v = Array.from(defaults) as Voci;
+        _v = Array.from(defaults);
     }
 
     $: in_default = _v.every((v,i) => v === defaults[i]);
@@ -37,18 +36,10 @@
     <h4>{names[index]}</h4>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="inner" class:default={in_default} on:keyup={keyup}>
-        <span>mi a {#if riflessivo}me{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[0]} />
-        <span>tü ti {#if riflessivo}te{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[1]} />
-        <span>{Math.round(Math.random()) ? "elu u" : "ela a"} {#if riflessivo}se{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[2]} />
-        <span>nui a {#if riflessivo}se{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[3]} />
-        <span>vui u {#if riflessivo}ve{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[4]} />
-        <span>{Math.round(Math.random()) ? "eli i" : "ele e"} {#if riflessivo}se{/if}</span>
-        <InputConRadice {radice} name="tempo.{index}" bind:value={_v[5]} />
+        {#each soggetti as soggetto, i}
+            <span>{soggetto}</span>
+            <InputConRadice {radice} name="tempo.{index}" bind:value={_v[i]} />
+        {/each}
     </div>
     <input type="hidden" name="tempo.{index}.default" value="true" disabled={!in_default}>
 </div>
