@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { postgresError2HTTPError, supabase } from "$lib/db";
 import { error, redirect } from "@sveltejs/kit";
 import { getID } from "./id";
-import type { Complete, CompleteAdmin, ConiugazioneRaw, Declinazione, Esempio } from "$lib/words/types";
+import type { Complete, CompleteAdmin, ConiugazioneRaw, Declinazione, Esempio, TempiRaw, Voci, VociImperative } from "$lib/words/types";
 import { TipoVerbo } from "$lib/words/types"
 import { emptyWord } from "$lib/words/utils";
 import { datoInvalido, getInt, getIntList, getMandatoryString, getStringOrNull } from "$lib/form-utils";
@@ -102,19 +102,36 @@ type ConiugazioneDB = Omit<ConiugazioneRaw, "participio"> & {
     participio: number | null
 }
 
+function getTempo<L extends 5|6>(data: FormData, index: number, len: L) {
+    if(data.get(`tempo.${index}.default`)) return null;
+    const voci = data.getAll(`tempo.${index}`);
+    if(voci.length === len && voci.every(v => (typeof v === "string" && v.length > 0))) return voci as (L extends 6 ? Voci : VociImperative);
+    throw datoInvalido("Ogni tempo verbale deve essere un array di stringhe");
+}
+
 function getConiugazione(data: FormData): ConiugazioneDB {
     const numero = getInt(data, "coniugazione.numero");
     if(numero < 0 || numero > 3) datoInvalido("Numero di coniugazione fuori dal range accettabile");
     const tipo = getInt(data, "coniugaizone.tipo");
     if(!TipoVerbo[tipo]) datoInvalido("Tipo di verbo non valido");
     const gerundio = getStringOrNull(data, "coniugazione.gerundio");
+    const voci: TempiRaw = [
+        getTempo(data, 0, 6),
+        getTempo(data, 1, 6),
+        getTempo(data, 2, 6),
+        getTempo(data, 3, 6),
+        getTempo(data, 4, 6),
+        getTempo(data, 5, 6),
+        getTempo(data, 6, 5),
+    ];
+
     return { 
         //@ts-ignore
         numero, 
         tipo, 
         gerundio,
         participio: null,
-        voci: null,
+        voci: voci.every(v => v === null) ? null : voci,
     }
 }
 
