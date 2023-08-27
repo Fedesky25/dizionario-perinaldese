@@ -15,9 +15,9 @@
     let ms: string, mp: string, fs: string, fp: string;
     $: if(data) {
         ms = data.ms;
-        mp = data.mp;
-        fs = data.fs;
-        fp = data.fp;
+        mp = data.mp || "";
+        fs = data.fs || "";
+        fp = data.fp || "";
     } else set_defaults();
     
     function set_defaults() {
