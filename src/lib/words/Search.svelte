@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { writable } from "svelte/store";
-    import { debounceInput, wait } from "$lib/timing";
+    import { debounceInput } from "$lib/timing";
 	import type { SearchResult } from "./types";
     import Loading from "$lib/Loading.svelte";
 	import { createEventDispatcher } from "svelte";
@@ -11,23 +11,18 @@
         none: string;
     }>();
 
-    export let url: string;
     export let placeholder: string|undefined = undefined;
     export let id: string|undefined = undefined;
     export let delay = 500;
+    export let action: (text: string) => Promise<SearchResult[]>;
 
     const regexp = /^[\/#\?\.&\s]*([\S\s]*)$/;
     let text = writable("");
-    $: query = regexp.exec($text)?.[1] || "";
     let results: SearchResult[] = [];
     let active: number = -1;
     let hidden = true;
-
-    const jsonReq: RequestInit = {
-        method: "GET",
-        credentials: "include",
-        headers: { "Accept": "aaplication/json" }
-    }
+    let loading = false;
+    let error = false;
 
     function emit(index: number) {
         active = -1;
@@ -35,16 +30,23 @@
         dispatch("word", results[index]);
     }
 
-    async function retrieve(query: string): Promise<SearchResult[]> {
+    $: query = regexp.exec($text)?.[1] || "";
+    $: retrieve(query);
+    
+    async function retrieve(query: string) {
         hidden = false;
         active = -1;
+        loading = true;
+        results = await action(query);
         try {
-            const res = await fetch(encodeURI(url+query), jsonReq);
-            return results = await res.json();
+            results = await action(query);
+            error = false;
         } catch(err) {
-            console.log(err);
-            return results = [];
+            console.dir(err);
+            error = true;
+            results = [];
         }
+        loading = false;
     }
 
     function handleArrows(this: HTMLInputElement, e: KeyboardEvent) {
@@ -79,7 +81,7 @@
 </script>
 
 <div class="wrapper">
-    <input type="search" {id} {placeholder}
+    <input type="text" {id} {placeholder}
         autocapitalize="off"
         on:focus={() => {hidden = false;}}
         on:keydown={handleSpecialChars} 
@@ -91,32 +93,30 @@
                 <p class="no-sel">Mentre scrivi in italiano o in perinaldese compariranno i risultati; con 1 o 2 lettere vedrai solo le parole che combaciano esattamente.</p>
                 <slot name="empty" />
             </div>
+        {:else if loading}
+            <Loading />
+        {:else if error}
+            <p class="padded">Errore interno: riprovare più tardi</p>
+        {:else if results.length === 0}
+            <p class="padded">Nessun risultato</p>
         {:else}
-            {#await retrieve(query)}
-                <Loading />
-            {:then results} 
-                {#if results.length === 0}
-                <p class="padded">Nessun risultato</p>
-                {:else}
-                <ul>
-                    {#each results as word, i}
-                        <li>
-                            <button 
-                                tabindex={-hidden} 
-                                type="button"
-                                class="padded" 
-                                class:active={i === active} 
-                                data-index={i} 
-                                on:click={select}>
-                                <span class="lex">{word.parola}</span>
-                                <span class="fgs">{word.funzione}</span>
-                                <span class="tra">{word.traduzione}</span>
-                            </button>
-                        </li>
-                    {/each}
-                </ul>
-                {/if}
-            {/await}
+            <ul>
+                {#each results as word, i}
+                    <li>
+                        <button 
+                            tabindex={-hidden} 
+                            type="button"
+                            class="padded" 
+                            class:active={i === active} 
+                            data-index={i} 
+                            on:click={select}>
+                            <span class="lex">{word.parola}</span>
+                            <span class="fgs">{word.funzione}</span>
+                            <span class="tra">{word.traduzione}</span>
+                        </button>
+                    </li>
+                {/each}
+            </ul>
         {/if}
     </div>
 </div>
