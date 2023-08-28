@@ -1,11 +1,11 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { postgresError2HTTPError, supabase } from "$lib/db";
-import { error, redirect } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { getID } from "./id";
 import type { Complete, CompleteAdmin, ConiugazioneRaw, Declinazione, Esempio, TempiRaw, Voci, VociImperative } from "$lib/words/types";
 import { TipoVerbo } from "$lib/words/types"
 import { emptyWord } from "$lib/words/utils";
-import { datoInvalido, getInt, getIntList, getMandatoryString, getStringOrNull } from "$lib/form-utils";
+import { InvalidField, datoInvalido, getInt, getIntList, getMandatoryString, getStringOrNull } from "$lib/form-utils";
 
 let fgs: {id: number, nome: string}[] = [];
 let last_date = Date.now();
@@ -112,7 +112,7 @@ function getTempo<L extends 5|6>(data: FormData, index: number, len: L) {
 function getConiugazione(data: FormData): ConiugazioneDB {
     const numero = getInt(data, "coniugazione.numero");
     if(numero < 0 || numero > 3) datoInvalido("Numero di coniugazione fuori dal range accettabile");
-    const tipo = getInt(data, "coniugaizone.tipo");
+    const tipo = getInt(data, "coniugazione.tipo");
     if(!TipoVerbo[tipo]) datoInvalido("Tipo di verbo non valido");
     const gerundio = getStringOrNull(data, "coniugazione.gerundio");
     const voci: TempiRaw = [
@@ -131,7 +131,7 @@ function getConiugazione(data: FormData): ConiugazioneDB {
         tipo, 
         gerundio,
         participio: null,
-        voci: voci.every(v => v === null) ? null : voci,
+        tempi: voci.every(v => v === null) ? null : voci,
     }
 }
 
@@ -156,7 +156,126 @@ interface ParolaDB {
     coniugazione: number|null;
 }
 
-async function createWord(word: ParolaDB, form: FormData) {
+interface AllDataDB {
+    parola: ParolaDB;
+    declinazione: Declinazione|null;
+    coniugazione: ConiugazioneDB|null;
+    participio: Declinazione|null;
+}
+
+
+function getDataFromForm(data: FormData) {
+    const parola = getMandatoryString(data,"parola");
+    const traduzione = getMandatoryString(data,"traduzione");
+    const funzione = getInt(data,"funzione");
+    if(fgs.findIndex(v => v.id === funzione) === -1) throw new InvalidField("funzione", 
+        "valore tra: " + fgs.map(v => v.id).join(", "), funzione.toString());
+    const ordine = getInt(data,"ordine");
+    if(ordine < 0) throw new InvalidField("ordine", "numero intero positivo o nullo", "numero intero negativo");
+    const descrizione = getStringOrNull(data,"descrizione");
+    const radice = funzione > 4 ? null : getMandatoryString(data,"radice");
+    const esempi = getEsempi(data);
+
+    const res: AllDataDB = {
+        parola: {
+            parola, traduzione, ordine, funzione, descrizione, esempi, radice,
+            declinazione: null, coniugazione: null
+        },
+        declinazione: null,
+        coniugazione: null,
+        participio: null,
+    }
+
+    if(funzione < 4) {
+        res.declinazione = getDeclinazione(data, "declinazione");
+        if(res.declinazione === null) throw new InvalidField("declinazione", "declinazione con almeno una flessione", "nulla");
+        if((res.declinazione.ms || res.declinazione.fs || res.declinazione.mp || res.declinazione.fp) === null)
+            throw new InvalidField("declinazione", "declinazione con almeno una flessione", "declinazione vuota");
+    }
+    else if(funzione === 4) {
+        res.coniugazione = getConiugazione(data);
+        const avere = res.coniugazione.tipo === TipoVerbo.intransitivo_avere || res.coniugazione.tipo === TipoVerbo.impersonale;
+        if(avere) {
+            const pp = getStringOrNull(data, "coniugazione.participio");
+            if(pp) res.participio = {ms: pp, mp: null, fs: null, fp: null};
+        }
+        else {
+            res.participio = getDeclinazione(data, "coniugazione.participio");
+            if(res.participio && (!res.participio.ms || !res.participio.mp || !res.participio.fs || !res.participio.fp)) 
+                throw new InvalidField("participio passato", "declinazione completa", "una o più flessioni mancanti");
+        }
+    }
+    return res;
+}
+
+async function createWord(data: AllDataDB) {
+    if(data.declinazione) data.parola.declinazione = await addDeclinazione(data.declinazione);
+    else if(data.coniugazione) {
+        if(data.participio) data.coniugazione.participio = await addDeclinazione(data.participio);
+        data.parola.coniugazione = await addConiugazione(data.coniugazione);
+    }
+    const res = await supabase.from("parole").insert(data.parola).select("id");
+    if(res.error) {
+        if(data.declinazione) await supabase.from("declinazioni").delete().eq("id", data.parola.declinazione);
+        else if(data.coniugazione) await supabase.from("coniugazioni").delete().eq("id", data.parola.coniugazione); 
+        throw postgresError2HTTPError(res.error);
+    }
+    return res.data[0].id;
+}
+
+async function updateWord(id: number, data: AllDataDB) {
+    const before_res = await supabase.from("parole").select("funzione, declinazione, coniugazione(id, participio)").eq("id", id);
+    if(before_res.error) throw postgresError2HTTPError(before_res.error);
+    //@ts-ignore
+    const before = before_res.data[0] as {funzione: number, declinazione: number|null, coniugazione: null|{id: number, participio: number}};
+    if(!before) throw error(404, {
+        message: "Parola inesistente",
+        details: "Non esiste alcuna parole con ID = "+id
+    });
+
+    if(data.declinazione) {
+        if(before.declinazione) {
+            data.parola.declinazione = before.declinazione;
+            const res = await supabase.from("declinazioni").update(data.declinazione).eq("id", before.declinazione);
+            if(res.error) throw postgresError2HTTPError(res.error);
+        }
+        else {
+            if(before.coniugazione) supabase.from("coniugazioni").delete().eq("id", before.coniugazione.id);
+            data.parola.declinazione = await addDeclinazione(data.declinazione);
+        }
+    }
+    else if(data.coniugazione) {
+        if(data.participio) {
+            if(before.coniugazione?.participio) {
+                data.coniugazione.participio = before.coniugazione.participio;
+                const res = await supabase.from("declinazioni").update(data.participio).eq("id", before.coniugazione.participio);
+                if(res.error) throw postgresError2HTTPError(res.error);
+            }
+            else data.coniugazione.participio = await addDeclinazione(data.participio);
+        }
+        else if(before.coniugazione?.participio) supabase.from("declinazioni").delete().eq("id", before.coniugazione.participio);
+        if(before.coniugazione) {
+            data.parola.coniugazione = before.coniugazione.id;
+            const res = await supabase.from("coniugazioni").update(data.coniugazione).eq("id", before.coniugazione.id);
+            if(res.error) throw postgresError2HTTPError(res.error);
+        }
+        else {
+            if(before.declinazione) supabase.from("declinazioni").delete().eq("id", before.declinazione);
+            data.parola.coniugazione = await addConiugazione(data.coniugazione);
+        }
+    }
+    else {
+        if(before.declinazione) supabase.from("declinazioni").delete().eq("id", before.declinazione);
+        if(before.coniugazione) {
+            if(before.coniugazione.participio) supabase.from("declinazioni").delete().eq("id", before.coniugazione.participio);
+            supabase.from("coniugazioni").delete().eq("id", before.coniugazione.id);
+        }
+    }
+    const res = await supabase.from("parole").update(data.parola).eq("id", id);
+    if(res.error) throw postgresError2HTTPError(res.error);
+}
+
+async function createWord_old(word: ParolaDB, form: FormData) {
     if(word.funzione < 4) {
         const declinazione = getDeclinazione(form, "declinazione");
         if(declinazione === null) datoInvalido("La declinazione deve essere presente");
@@ -187,7 +306,7 @@ async function createWord(word: ParolaDB, form: FormData) {
     }
 }
 
-async function updateWord(id: number, word: ParolaDB, form: FormData) {
+async function updateWord_old(id: number, word: ParolaDB, form: FormData) {
     const before_res = await supabase.from("parole").select("funzione, declinazione, coniugazione(id, participio)").eq("id", id);
     if(before_res.error) throw postgresError2HTTPError(before_res.error);
     //@ts-ignore
@@ -240,30 +359,27 @@ async function updateWord(id: number, word: ParolaDB, form: FormData) {
 
 export const actions: Actions = {
     default: async ({ params, request }) => {
-        const data = await request.formData()
-        const parola = getMandatoryString(data,"parola");
-        const traduzione = getMandatoryString(data,"traduzione");
-        const funzione = getInt(data,"funzione");
-        if(fgs.findIndex(v => v.id === funzione) === -1) datoInvalido('Valore di "funzione" fuori dal range accettato');
-        const ordine = getInt(data,"ordine");
-        if(ordine < 0) datoInvalido('"ordine" deve essere positivo');
-        const descrizione = getStringOrNull(data,"descrizione");
-        const radice = funzione > 4 ? null : getMandatoryString(data,"radice");
-        const esempi = getEsempi(data);
-
-        const word: ParolaDB = {
-            parola, traduzione, ordine, funzione, descrizione, esempi, radice,
-            declinazione: null, coniugazione: null
-        };
-
+        const form = await request.formData();
+        let data: AllDataDB;
+        try { data = getDataFromForm(form); }
+        catch(err) {
+            if(err instanceof InvalidField) return fail(400, {
+                success: false, field: err.field,
+                expected: err.expected, got: err.got
+            });
+            else throw error(500, {
+                message: "Errore ignoto",
+                details: ""+err
+            });
+        }
         let id: number;
-        if(params.id === "crea") id = await createWord(word, data);
+        if(params.id === "crea") id = await createWord(data);
         else {
             id = getID(params);
-            await updateWord(id, word, data);
+            await updateWord(id, data);
         }
 
-        const collegamenti = getCollegamenti(data);
+        const collegamenti = getCollegamenti(form);
         collegamenti.riferimento = id;
         const res = await supabase.rpc("aggiorna_collegamenti", collegamenti);
         if(res.error) throw postgresError2HTTPError(res.error);
