@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { handleSpecialChars } from "$lib/words/utils";
+	import { getSearchFilter, handleSpecialChars } from "$lib/words/utils";
     import { debounceInput } from "$lib/timing";
 	import ModalForm from "$lib/ModalForm.svelte";
 	import type { PageData } from "./$types";
@@ -11,30 +11,25 @@
     export let data: PageData;
     let words: Summary[] = data.words;
     let can_extend = words.length === 50;
-    
-    // $: if(data.cached) {
-    //     const cache = sessionStorage.getItem("cache");
-    //     if(cache) words = JSON.parse(cache);
-    //     else extend();
-    // } else {
-    //     words = data.parole;
-        
-    // }
+    let error: string|null;
 
     const search = writable("");
 
-    const req: RequestInit = {
-        method: "GET",
-        credentials: "include",
-        headers: { "Accept": "application/json" }
+    function setError(msg: string) {
+        can_extend = false;
+        error = msg;
+        words = [];
     }
     
     let first_time = true;
     async function searchFor(str: string) {
         if(first_time) return void (first_time = false);
-        const url = "/admin/dizionario?opzione=" + (str ? `cerca&parametro=${str}` : "riassunto");
-        const res = await fetch(url, req);
-        words = await res.json();
+        const res = await (str 
+            ? data.supabase.rpc("ricerca_singola", getSearchFilter(str))
+            : data.supabase.rpc("riassunto")
+        );
+        if(res.error) setError(res.error.message);
+        words = res.data;
         can_extend = str ? false : words.length === 50;
     }
     $: searchFor($search);
@@ -43,11 +38,15 @@
     async function extend() {
         if(extending || !can_extend) return;
         extending = true;
-        const res = await fetch(`/admin/dizionario?opzione=riassunto&parametro=${words.length}`, req);
-        const newWords: Summary[] = await res.json();
-        can_extend = newWords.length === 50;
-        words.push(...newWords);
-        words = words;
+        const res = await data.supabase.rpc("riassunto", {salta: words.length});
+        if(res.error) setError(res.error.message);
+        else {
+            error = null;
+            const newWords: Summary[] = await res.data;
+            can_extend = newWords.length === 50;
+            words.push(...newWords);
+            words = words;
+        }
         extending = false;
     }
 
@@ -89,7 +88,12 @@
                 <Voce {word} {index} />
             {/each}
         </table>
-        {#if words.length === 0}
+        {#if error}
+            <div class="table-msg">
+                <img src="/icons/cloud-error.svg" alt="Errore nel cloud"><br>
+                <span>{error}</span>
+            </div>
+        {:else if words.length === 0}
             <div class="table-msg">
                 <img src="/icons/nothing-here.svg" alt="Nulla qui"><br>
                 <span>Nessun risultato di ricerca</span>
