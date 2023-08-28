@@ -1,12 +1,14 @@
 <script lang="ts">
-    import type { PageData } from "./$types";
+    import type { ActionData, PageData } from "./$types";
 	import Coniugazione from "./Coniugazione.svelte";
     import Declinazione from "./Declinazione.svelte";
     import Collegamenti from "./Collegamenti.svelte";
     import Esempi from "./Esempi.svelte";
     import { emptyConiugazione, splitCollegamenti } from "$lib/words/utils";
 	import type { CompleteAdmin } from "$lib/words/types";
+	import { enhance } from "$app/forms";
 
+    export let form: ActionData;
     export let data: PageData;
     const fgs = data.funzioni;
 
@@ -38,9 +40,9 @@
     <title>{data.id ? `Modifica «${parola}»` : "Crea parola"} | Dizionario Perinaldese</title>
 </svelte:head>
 
-<form method="POST">
-    <div class="buttons">
-        <div>
+<form method="POST" use:enhance>
+    <div class="sticky-middle">
+        <div class="buttons">
             <button
                 title="Salva"
                 class="outline-btn"
@@ -127,12 +129,36 @@
         <h2>Esempi</h2>
         <Esempi data={word.esempi||[]} />
     </div>
+    {#if form?.success === false}
+    <div class="sticky-middle">
+        <div>
+            <h2 class="err">Errore</h2>
+            <table>
+                <tr>
+                    <th scope="row">Campo:</th>
+                    <td>{form.field}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Atteso:</th>
+                    <td>{form.expected}</td>
+                </tr>
+                {#if form.got}
+                <tr>
+                    <th scope="row">Ottenuto:</th>
+                    <td>{form.got}</td>
+                </tr>
+                {/if}
+            </table>
+        </div>
+    </div>
+    {/if}
 </form>
 
 <style>
     :global(body) {
         overflow-y: scroll !important;
-        background-color: white;
+        background-color: white !important;
+        max-height: 100%;
     }
     h1 {
         display: flex;
@@ -200,13 +226,15 @@
             grid-template-columns: 1fr minmax(40ch, 80ch) 1fr;
             min-height: 100vh;
         }
-        .buttons {
+        .sticky-middle {
             align-self: start;
             position: sticky;
             top: 50%;
         }
-        .buttons > div {
+        .sticky-middle > div {
             transform: translateY(-50%);
+        }
+        .buttons {
             display: flex;
             gap: 3rem;
             flex-direction: column;
@@ -263,5 +291,23 @@
             grid-row: 1;
             margin-bottom: .5rem;
         }
+    }
+    h2.err {
+        color: var(--rosso);
+        font-size: 1.2rem;
+        margin-bottom: .5rem;
+    }
+    table {
+        margin: 0 auto;
+    }
+    th {
+        text-align: right;
+        font-weight: 600;
+    }
+    td {
+        text-align: left;
+    }
+    th, td {
+        padding: .2rem .3ch;
     }
 </style>
