@@ -44,6 +44,7 @@
 <svelte:body on:keyup={handleDefault} />
 
 {#if single}
+    <input type="hidden" disabled={!in_default} name="coniugazione.participio" value="">
     <div class="oneline" class:default={in_default}>
         <h3>Participio passato</h3>
         <InputConRadice name="coniugazione.participio" bind:value={ms} {radice} />
