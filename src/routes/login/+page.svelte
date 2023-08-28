@@ -1,10 +1,11 @@
 <script>
     import { enhance } from "$app/forms";
+	import { goto } from "$app/navigation";
+    import { signin } from "./signin.js";
     export let form;
+    export let data;
 
-    function clear() {
-        if(form) form.error = false;
-    }
+    function clear() { if(form) form = null;}
 </script>
 
 <svelte:head>
@@ -13,19 +14,24 @@
 
 <div class="center">
     <h1>Login al dizionario perinaldese</h1>
-    <form method="POST" use:enhance>
+    <form method="POST" use:enhance={async ({cancel, formData}) => {
+        cancel();
+        const res = await signin(formData, data.supabase);
+        if(res.success) goto(data.goto);
+        else form = res.form;
+    }}>
         <div>
-            <label for="username">Nome utente</label>
-            <input type="text" name="username" autocomplete="off" required title="Inserisci il nome utente" on:input={clear}>
+            <label for="email">Nome utente</label>
+            <input type="email" name="email" required title="Inserisci la mail" value={form?.email} on:input={clear}>
         </div>
         <div>
             <label for="password">Password</label>
-            <input type="password" name="password" autocomplete="off" required title="Inserisci la password" on:input={clear}>
+            <input type="password" name="password" required title="Inserisci la password" on:input={clear}>
         </div>
         <button type="submit">Invia</button>
     </form>
-    {#if form?.error} 
-    <p>Invalid credentials</p>
+    {#if form} 
+    <p>{form.error}</p>
     {/if}
 </div>
 
@@ -51,8 +57,8 @@
         text-align: center;
     }
     form > * + * {margin-top: 1rem;}
-    input[type=text],
-    input[type=password] {
+    input[type="email"],
+    input[type="password"] {
         width: 100%;
         font-size: 13pt;
         font-weight: 600;
@@ -69,8 +75,8 @@
 
         margin-top: .3rem;
     }
-    input[type=text]:focus,
-    input[type=password]:focus {
+    input[type="email"]:focus,
+    input[type="password"]:focus {
         outline: none;
         border-color: rgba(154, 185, 115, .6);
     }
