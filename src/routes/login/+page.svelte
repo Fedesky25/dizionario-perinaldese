@@ -5,7 +5,7 @@
     export let form;
     export let data;
 
-    function clear() { if(form) form = null;}
+    function clear() { if(form) form.error = '';}
 </script>
 
 <svelte:head>
@@ -30,7 +30,7 @@
         </div>
         <button type="submit">Invia</button>
     </form>
-    {#if form} 
+    {#if form?.error} 
     <p>{form.error}</p>
     {/if}
 </div>
