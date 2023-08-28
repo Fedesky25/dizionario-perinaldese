@@ -1,8 +1,7 @@
 import type { PageServerLoad } from "./$types";
-import { supabase } from "$lib/db";
 import type { CompleteDisplay } from "$lib/words/types";
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
     const parola = url.searchParams.get("parola");
     if(!parola) return { 
         code: 200,
@@ -12,8 +11,8 @@ export const load: PageServerLoad = async ({ url }) => {
     const id = +parola;
     const res = await (
         Number.isInteger(id) && id > 0
-        ? supabase.rpc("parola_singola", {id_parola: id})
-        : supabase.rpc("parola_multipla", {parola_esatta: parola})
+        ? locals.supabase.rpc("parola_singola", {id_parola: id})
+        : locals.supabase.rpc("parola_multipla", {parola_esatta: parola})
     );
     if(res.error) {
         console.error(res.error);

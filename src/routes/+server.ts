@@ -1,6 +1,6 @@
 import type { RequestHandler } from "./$types";
 import { json, error } from "@sveltejs/kit";
-import { words, supabase } from "$lib/db";
+import { words } from "$lib/db";
 import { getSearchFilterOld, getSearchFilter } from "$lib/words/utils";
 import type { Complete } from "$lib/words/types";
 
@@ -33,14 +33,14 @@ function format(res: Complete[]) {
     }
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
     const parola = url.searchParams.get("filtro");
     const mode = url.searchParams.get("operazione") || "cerca";
     switch(mode) {
         case "cerca": {
             if(!parola) throw error(400, NoKeyError);
             const filter = getSearchFilter(parola);
-            const res = await supabase.rpc("ricerca_completa", filter);
+            const res = await locals.supabase.rpc("ricerca_completa", filter);
             if(res.error) throw error(500, {
                 message: res.error.message,
                 details: res.error.details
@@ -52,8 +52,8 @@ export const GET: RequestHandler = async ({ url }) => {
             const id = +parola;
             const res = await (
                 Number.isInteger(id) && id > 0
-                ? supabase.rpc("parola_singola", {id_parola: id})
-                : supabase.rpc("parola_multipla", {parola_esatta: parola})
+                ? locals.supabase.rpc("parola_singola", {id_parola: id})
+                : locals.supabase.rpc("parola_multipla", {parola_esatta: parola})
             );
             if(res.error) throw error(500, {
                 message: res.error.message,
