@@ -1,12 +1,9 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
     import { goto } from "$app/navigation";
-    async function logout() {
-        await fetch("/logout", {
-            credentials: "include",
-            method: "POST"
-        });
-        goto("/");
-    }
+	import type { PageData } from "./$types";
+
+    export let data: PageData
 </script>
 
 <svelte:head>
@@ -42,7 +39,13 @@
         </li>
     </ul>
 </main>
-<button on:click={logout}>Log out</button>
+<form action="/logout" method="post" use:enhance={async ({ cancel }) => {
+    cancel();
+    await data.supabase.auth.signOut();
+    goto("/");
+}}>
+    <button type="submit">Log out</button>
+</form>
 
 <style>
     :global(body) {
@@ -134,10 +137,12 @@
         background-position: center;
         color: white;
     }
-    button {
+    form {
         position: fixed;
         bottom: 0;
         right: 0;
+    }
+    button {
         border: #9AB973 1px solid;
         padding: .4rem .8rem;
         background-color: #ffffff20;
@@ -160,7 +165,7 @@
         a {
             padding: 2.5rem;
         }
-        button {
+        form {
             bottom: 1rem;
             right: 1rem;
         }
