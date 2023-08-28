@@ -364,7 +364,7 @@ export const actions: Actions = {
         try { data = getDataFromForm(form); }
         catch(err) {
             if(err instanceof InvalidField) return fail(400, {
-                success: false, field: err.field,
+                success: false as const, field: err.field,
                 expected: err.expected, got: err.got
             });
             else throw error(500, {
@@ -384,7 +384,7 @@ export const actions: Actions = {
         const res = await supabase.rpc("aggiorna_collegamenti", collegamenti);
         if(res.error) throw postgresError2HTTPError(res.error);
 
-        if(params.id === "crea") return { success: true };
+        if(params.id === "crea") return { success: true as const };
         else throw redirect(303, "/admin/dizionario");
     }
 };
