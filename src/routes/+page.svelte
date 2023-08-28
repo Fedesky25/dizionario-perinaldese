@@ -6,6 +6,7 @@
 
     import type { PageData } from "./$types";
 	import { goto } from "$app/navigation";
+	import { getSearchFilter } from "$lib/words/utils";
 
     export let data: PageData;
 
@@ -23,7 +24,13 @@
         retrieving = false;
     }
 
-    let scrollY: number
+    let scrollY: number;
+
+    async function search(text: string) {
+        const res = await data.supabase.rpc("ricerca_completa", getSearchFilter(text));
+        if(res.error) throw res.error;
+        return res.data;
+    }
 </script>
 
 <svelte:head>
@@ -62,7 +69,7 @@
             <Search 
                 id="ricerca" 
                 placeholder="Cerca..." 
-                url="/?operazione=cerca&filtro=" 
+                action={search} 
                 on:word={e => select(e.detail.id, e.detail.parola)}>
                 <p slot="empty">Clicca sul dado per vedere una parola casuale</p>
             </Search>
