@@ -46,11 +46,8 @@
 {#if single}
     <div class="oneline" class:default={in_default}>
         <h3>Participio passato</h3>
-        <InputConRadice name="coniugazione.participio.ms" bind:value={ms} {radice} />
+        <InputConRadice name="coniugazione.participio" bind:value={ms} {radice} />
     </div>
-    <input type="hidden" name="coniugazione.participio.mp" value="NULL">
-    <input type="hidden" name="coniugazione.participio.fs" value="NULL">
-    <input type="hidden" name="coniugazione.participio.fp" value="NULL">
 {:else}
     <h3>Participio passato</h3>
     <div class="grid" class:default={in_default}>
@@ -63,8 +60,8 @@
         <label for="part-pass-fp">femm plur</label>
         <InputConRadice {radice} name="coniugazione.participio.fp" bind:value={fp} id="part-pass-fp"/>
     </div>
+    <input type="hidden" disabled={!in_default} name="coniugazione.participio" value="NULL">
 {/if}
-<input type="hidden" disabled={!in_default} name="coniugazione.participio" value="NULL">
 
 <style>
     h3 {
