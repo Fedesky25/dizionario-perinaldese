@@ -1,7 +1,7 @@
 <script>
     import { enhance } from "$app/forms";
 	import { goto } from "$app/navigation";
-    import { signin } from "./signin.js";
+    import { signin } from "./signin";
     export let form;
     export let data;
 
@@ -22,7 +22,7 @@
     }}>
         <div>
             <label for="email">Nome utente</label>
-            <input type="email" name="email" required title="Inserisci la mail" value={form?.email} on:input={clear}>
+            <input type="email" name="email" required title="Inserisci la mail" value={form?.email || ""} on:input={clear}>
         </div>
         <div>
             <label for="password">Password</label>
