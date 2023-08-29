@@ -23,6 +23,7 @@
     let hidden = true;
     let loading = false;
     let error = false;
+    let firstTime = true;
 
     function emit(index: number) {
         active = -1;
@@ -34,10 +35,10 @@
     $: retrieve(query);
     
     async function retrieve(query: string) {
+        if(firstTime) return void (firstTime = false);
         hidden = false;
         active = -1;
         loading = true;
-        results = await action(query);
         try {
             results = await action(query);
             error = false;
