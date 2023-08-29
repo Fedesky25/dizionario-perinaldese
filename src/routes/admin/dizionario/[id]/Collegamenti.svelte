@@ -1,10 +1,13 @@
 <script lang="ts">
 	import Search from "$lib/words/Search.svelte";
 	import type { SearchResult } from "$lib/words/types";
+	import { getSearchFilter } from "$lib/words/utils";
+	import type { SupabaseClient } from "@supabase/supabase-js";
     import { scale } from "svelte/transition";
 
     export let name: string;
     export let data: {id: number, parola: string}[];
+    export let client: SupabaseClient;
 
     function addWord(e: CustomEvent<SearchResult>) {
         //@ts-ignore
@@ -20,7 +23,10 @@
 
 <div class="wrapper">
     <div class="cerca box">
-        <Search url="/admin/dizionario?opzione=cerca&parametro=" placeholder="Aggiungi" on:word={addWord} />
+        <Search action={async (text) => {
+            const res = await client.rpc("ricerca_singola", getSearchFilter(text));
+            return res.error ? [] : res.data;
+        }} placeholder="Aggiungi" on:word={addWord} />
     </div>
     {#each data as item, i (item.id)}
         <input type="hidden" {name} value={item.id}>
