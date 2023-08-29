@@ -4,9 +4,13 @@
     import Declinazione from "./Declinazione.svelte";
     import Collegamenti from "./Collegamenti.svelte";
     import Esempi from "./Esempi.svelte";
-    import { emptyConiugazione, splitCollegamenti } from "$lib/words/utils";
+    import { emptyConiugazione, emptyWord, splitCollegamenti } from "$lib/words/utils";
 	import type { CompleteAdmin } from "$lib/words/types";
 	import { enhance } from "$app/forms";
+	import { HttpError_1, type SubmitFunction } from "@sveltejs/kit";
+	import { createWord, getDataFromForm, updateCollegamenti, updateWord } from "./logic";
+	import { InvalidField } from "$lib/form-utils";
+	import { goto } from "$app/navigation";
 
     export let form: ActionData;
     export let data: PageData;
@@ -34,13 +38,44 @@
     // );
     $: parola_automatica = funzione <= 4;
     $: [vedi_anche, sinonimi, contrari] = splitCollegamenti(word.collegamenti||[]);
+
+    const action: SubmitFunction = async ({ cancel, formData, formElement }) => {
+        cancel();
+        try {
+            const word = getDataFromForm(formData, data.funzioni.map(v => v.id));
+            let id = data.id;
+            if(id) await updateWord(id, word, data.supabase);
+            else id = await createWord(word, data.supabase);
+            await updateCollegamenti(id, formData, data.supabase);
+            form = { success: true };
+            if(id) goto("/admin/dizionario");
+            else data.parola = emptyWord(funzione); 
+        }
+        catch(err) {
+            if(err instanceof InvalidField) form = {
+                success: false, field: err.field,
+                expected: err.expected, got: err.got
+            };
+            else if(err instanceof HttpError_1) form = {
+                success: false, field: err.body.message,
+                expected: err.body.details||"", got: undefined
+            }
+            else {
+                console.error(err);
+                form = {
+                    success: false, field: "Ignoto",
+                    expected: "Ignoto", got: ""+err
+                };
+            }
+        }
+    }
 </script>
 
 <svelte:head>
     <title>{data.id ? `Modifica «${parola}»` : "Crea parola"} | Dizionario Perinaldese</title>
 </svelte:head>
 
-<form method="POST" use:enhance>
+<form method="POST" use:enhance={action}>
     <div class="sticky-middle">
         <div class="buttons">
             <button
