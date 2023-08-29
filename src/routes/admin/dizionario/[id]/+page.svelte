@@ -7,7 +7,7 @@
     import { emptyConiugazione, emptyWord, splitCollegamenti } from "$lib/words/utils";
 	import type { CompleteAdmin } from "$lib/words/types";
 	import { enhance } from "$app/forms";
-	import { HttpError_1, type SubmitFunction } from "@sveltejs/kit";
+	import type { SubmitFunction } from "@sveltejs/kit";
 	import { createWord, getDataFromForm, updateCollegamenti, updateWord } from "./logic";
 	import { InvalidField } from "$lib/form-utils";
 	import { goto } from "$app/navigation";
@@ -39,7 +39,7 @@
     $: parola_automatica = funzione <= 4;
     $: [vedi_anche, sinonimi, contrari] = splitCollegamenti(word.collegamenti||[]);
 
-    const action: SubmitFunction = async ({ cancel, formData, formElement }) => {
+    const onsubmit: SubmitFunction = async ({ cancel, formData }) => {
         cancel();
         try {
             const word = getDataFromForm(formData, data.funzioni.map(v => v.id));
@@ -56,8 +56,13 @@
                 success: false, field: err.field,
                 expected: err.expected, got: err.got
             };
-            else if(err instanceof HttpError_1) form = {
+            else if(
+                typeof err === "object" && err
+                && "body" in err && typeof err.body === "object" && err.body
+                && "message" in err.body && typeof err.body.message === "string"
+            ) form = {
                 success: false, field: err.body.message,
+                // @ts-ignore
                 expected: err.body.details||"", got: undefined
             }
             else {
@@ -75,7 +80,7 @@
     <title>{data.id ? `Modifica «${parola}»` : "Crea parola"} | Dizionario Perinaldese</title>
 </svelte:head>
 
-<form method="POST" use:enhance={action}>
+<form method="POST" use:enhance={onsubmit}>
     <div class="sticky-middle">
         <div class="buttons">
             <button
@@ -154,11 +159,11 @@
         <h2>Collegamenti</h2>
         <div class="links">
             <h3>Vedi anche</h3>
-            <Collegamenti name="vedi_anche" data={vedi_anche} />
+            <Collegamenti client={data.supabase} name="vedi_anche" data={vedi_anche} />
             <h3>Sinonimi</h3>
-            <Collegamenti name="sinonimi" data={sinonimi} />
+            <Collegamenti client={data.supabase} name="sinonimi" data={sinonimi} />
             <h3>Contrari</h3>
-            <Collegamenti name="sinonimi" data={contrari} />
+            <Collegamenti client={data.supabase} name="sinonimi" data={contrari} />
         </div>
         <hr>
         <h2>Esempi</h2>
