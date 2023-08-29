@@ -104,7 +104,7 @@
     }
     tr > td:first-child {position: relative;}
     tr.warning > td:first-child::before {
-        content: url('../assets/generic-error.svg');
+        content: url('/icons/generic-error.svg');
         position: absolute;
         left: -1ch;
         top: 50%;
