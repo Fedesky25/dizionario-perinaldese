@@ -203,6 +203,8 @@
     h1 {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: .5rem;
     }
 
@@ -218,6 +220,9 @@
     :global(textarea:focus) {
         border-color: var(--olivina);
         outline: none;
+    }
+    textarea {
+        resize: vertical;
     }
 
     h1 input {
@@ -257,14 +262,70 @@
         width: 1.3rem;
         margin-right: 1ch;
     }
+    .named-input {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .two-cols {
+        margin-top: 4rem;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        align-items: start;
+        column-gap: 3ch;
+        row-gap: 1rem;
+    }
+    hr {
+        height: 0;
+        border: 0;
+        border-bottom: 1px solid #ccc;
+        margin: 4rem 0;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .links h3 {
+        margin-bottom: .5rem;
+    }
+    @media (max-width: 50rem) {
+        form {
+            padding-bottom: 20vh;
+        }
+        h1 select {
+            max-width: 100%;
+            text-align: center;
+        }
+        .sticky-middle {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0;
+            background-color: white;
+            column-gap: 1rem;
+            border-bottom: 1px solid #ccc;
+        }
+        .body {
+            padding: 1rem;
+            z-index: 1;
+        }
+        .links h3 {
+            margin-top: 1.7rem;
+        }
+    }
     @media (min-width: 50rem) {
-        h1 {
-            align-items: center;
+        select {
+            max-width: 100%;
         }
         form {
             display: grid;
             grid-template-columns: 1fr minmax(40ch, 80ch) 1fr;
             min-height: 100vh;
+            column-gap: 1rem;
         }
         .sticky-middle {
             align-self: start;
@@ -290,34 +351,14 @@
             align-self: center;
         }
         .two-cols {
-            margin-top: 4rem;
-            display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto auto;
-            align-items: start;
-            column-gap: 3ch;
-            row-gap: 1rem;
         }
         .named-input {
             grid-column: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         textarea {
             grid-column: 2;
             grid-row: 1/4;
-            resize: vertical;
-        }
-        hr {
-            height: 0;
-            border: 0;
-            border-bottom: 1px solid #ccc;
-            margin: 4rem 0;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 2rem;
         }
         .links {
             display: grid;
@@ -329,7 +370,6 @@
         }
         .links h3 {
             grid-row: 1;
-            margin-bottom: .5rem;
         }
     }
     h2.err {
