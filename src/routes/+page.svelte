@@ -58,7 +58,7 @@
     </svg>
     <nav>
         <ul>
-            <li class="from-top small"><a href="/grammatica">grammatica</a></li>
+            <!-- <li class="from-top small"><a href="/grammatica">grammatica</a></li> -->
             <li class="from-top small"><a href="#progetto">progetto</a></li>
             <li class="from-top small"><a href="#contattaci">contattaci</a></li>
         </ul>
