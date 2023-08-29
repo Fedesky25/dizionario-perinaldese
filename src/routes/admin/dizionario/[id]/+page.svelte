@@ -94,6 +94,12 @@
                 </svg>
                 <span>Salva</span>
             </button>
+            {#if data.id}
+            <a href="/admin/dizionario" style="--clr: lightslategray;">
+                <svg style="transform: rotate(90deg);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path fill="currentColor" d="M 13.035156 2.9648438 C 11.930156 2.9648438 11.035156 3.8598438 11.035156 4.9648438 L 11.035156 15.964844 L 5.9648438 15.964844 C 5.5608438 15.964844 5.1950156 16.206078 5.0410156 16.580078 C 4.8850156 16.954078 4.9718125 17.384875 5.2578125 17.671875 L 14.328125 26.742188 C 14.719125 27.133187 15.351187 27.133187 15.742188 26.742188 L 24.814453 17.671875 C 25.005453 17.480875 25.107422 17.224844 25.107422 16.964844 C 25.107422 16.835844 25.08225 16.704078 25.03125 16.580078 C 24.87725 16.206078 24.511422 15.964844 24.107422 15.964844 L 19.035156 15.964844 L 19.035156 4.9648438 C 19.035156 3.8598438 18.140156 2.9648438 17.035156 2.9648438 L 13.035156 2.9648438 z"></path></svg>
+                <span>Indietro</span>
+            </a>
+            {:else}
             <button
                 title="Drop"
                 class="outline-btn"
@@ -104,6 +110,7 @@
                 </svg>
                 <span>Drop</span>
             </button>
+            {/if}
         </div>
     </div>
     <div class="body">
@@ -237,7 +244,7 @@
         border-bottom-style: dashed;
         color: #444;
     }
-    button {
+    button, a {
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--clr);
@@ -249,7 +256,11 @@
         align-items: center;
         cursor: pointer;
     }
-    button:hover:not(:disabled) {
+    a {
+        text-decoration: none;
+    }
+    button:hover:not(:disabled),
+    a:hover {
         color: white;
         background-color: var(--clr);
     }
@@ -342,7 +353,7 @@
             align-items: center;
             height: max-content;  
         }
-        button {
+        button, a {
             transform: rotate(45deg);
         }
         .body {
