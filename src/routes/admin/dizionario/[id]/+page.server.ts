@@ -3,7 +3,7 @@ import { postgresError2HTTPError } from "$lib/db";
 import { error, fail, redirect } from "@sveltejs/kit";
 import { InvalidField } from "$lib/form-utils";
 
-import { getDataFromForm, createWord, updateWord, getCollegamenti, getID, type AllDataDB } from "./logic";
+import { getDataFromForm, createWord, updateWord, getCollegamenti, getID, type AllDataDB, updateCollegamenti } from "./logic";
 
 export const actions: Actions = {
     default: async ({ params, request, locals }) => {
@@ -29,12 +29,7 @@ export const actions: Actions = {
             id = getID(params);
             await updateWord(id, data, client);
         }
-
-        const collegamenti = getCollegamenti(form);
-        collegamenti.riferimento = id;
-        const res = await client.rpc("aggiorna_collegamenti", collegamenti);
-        if(res.error) throw postgresError2HTTPError(res.error);
-
+        await updateCollegamenti(id, form, client);
         if(params.id === "crea") return { success: true as const };
         else throw redirect(303, "/admin/dizionario");
     }

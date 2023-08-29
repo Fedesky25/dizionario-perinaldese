@@ -51,6 +51,13 @@ export function getCollegamenti(data: FormData) {
     return {riferimento: 0, tipologie, parole_collegate};
 }
 
+export async function updateCollegamenti(id: number, data: FormData, client: SupabaseClient) {
+    const collegamenti = getCollegamenti(data);
+    collegamenti.riferimento = id;
+    const res = await client.rpc("aggiorna_collegamenti", collegamenti);
+    if(res.error) throw postgresError2HTTPError(res.error);
+}
+
 function getDeclinazione(data: FormData, key: string): Declinazione|null {
     if(data.get(key) === "NULL") return null;
     return {
