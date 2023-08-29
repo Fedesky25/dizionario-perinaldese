@@ -29,8 +29,10 @@
             : data.supabase.rpc("riassunto")
         );
         if(res.error) setError(res.error.message);
-        words = res.data;
-        can_extend = str ? false : words.length === 50;
+        else {
+            words = res.data;
+            can_extend = str ? false : words.length === 50;
+        }
     }
     $: searchFor($search);
     
@@ -70,42 +72,44 @@
     <h1>Voci del dizionario</h1>
     <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo. I risultati della ricerca compaiono man mano che si scrive.</p>
     <div class="interaction">
-        <input type="search" placeholder="Cerca..." 
+        <input type="text" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
             use:debounceInput={{ delay: 500, store: search }}>
         <a class="btn" href="/admin/dizionario/crea">Aggiungi parola</a>
     </div>
     <div class="table-container">
-        <table>
-            <tr>
-                <th>Parola</th>
-                <th>Traduzione</th>
-                <th>Funzione</th>
-                <th>Desc.</th>
-                <th>Esempi</th>
-            </tr>
-            {#each words as word, index (word.id)}
-                <Voce {word} {index} />
-            {/each}
-        </table>
-        {#if error}
-            <div class="table-msg">
-                <img src="/icons/cloud-error.svg" alt="Errore nel cloud"><br>
-                <span>{error}</span>
-            </div>
-        {:else if words.length === 0}
-            <div class="table-msg">
-                <img src="/icons/nothing-here.svg" alt="Nulla qui"><br>
-                <span>Nessun risultato di ricerca</span>
-            </div>
-        {/if}
-        {#if extending}
-            <div class="load-wrapper">
-                <Loading />
-            </div>
-        {:else if can_extend}
-            <button class="btn" type="button" disabled={extending} on:click={extend}>Carica altri</button>
-        {/if}
+        <div class="scrollable">
+            <table>
+                <tr>
+                    <th>Parola</th>
+                    <th>Traduzione</th>
+                    <th>Funzione</th>
+                    <th>Desc.</th>
+                    <th>Esempi</th>
+                </tr>
+                {#each words as word, index (word.id)}
+                    <Voce {word} {index} />
+                {/each}
+            </table>
+            {#if error}
+                <div class="table-msg">
+                    <img src="/icons/cloud-error.svg" alt="Errore nel cloud"><br>
+                    <span>{error}</span>
+                </div>
+            {:else if words.length === 0}
+                <div class="table-msg">
+                    <img src="/icons/nothing-here.svg" alt="Nulla qui"><br>
+                    <span>Nessun risultato di ricerca</span>
+                </div>
+            {/if}
+            {#if extending}
+                <div class="load-wrapper">
+                    <Loading />
+                </div>
+            {:else if can_extend}
+                <button class="btn" type="button" disabled={extending} on:click={extend}>Carica altri</button>
+            {/if}
+        </div>
     </div>
 </div>
 
@@ -140,16 +144,13 @@
 </ModalForm>
 
 <style>
-    :global(html) {overflow: hidden;}
-    :global(body) {
+    .container {
         overflow: hidden;
         background-color: #f8f8f8;
-    }
-    .container {
         display: grid;
         width: 100%;
         max-width: 100%;
-        height: 100%;
+        height: 100dvh;
         overflow: hidden;
     }
     .interaction {display: flex;}
@@ -158,11 +159,19 @@
         text-decoration: none;
     }
     .table-container {
-        overflow-y: auto;
         max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        /* https://stackoverflow.com/questions/27784727/how-to-make-child-div-scrollable-when-it-exceeds-parent-height */
+    }
+    .scrollable {
+        overflow-y: scroll;
+        max-height: 100%;
+        height: 100%;
         scrollbar-width: thin;
         scrollbar-color: #e1e1e1 transparent;
     }
+
     table {
         width: 100%;
         border-spacing: 0;
@@ -221,18 +230,19 @@
             background-color: white;
             border-radius: 1rem;
             box-shadow: 0 0 45px #0001;
-            padding: 0 1rem 1rem;
+            padding: 1rem;
             margin: 0 auto;
             width: 100%;
-            height: fit-content;
             max-width: 80ch;
             position: relative;
+            align-self: start;
+            height: fit-content;
         }
     }
     @media (min-width: 140ch) {.container {grid-template-columns: 42ch 1fr;}}
     th {
         border-bottom: 2px solid var(--olivina);
-        padding: 1rem 1ch .5rem;
+        padding: .5rem 1ch;
         position: sticky;
         top: 0;
         background-color: white;
