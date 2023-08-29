@@ -89,18 +89,19 @@ export function emptyDeclinazione(): Declinazione {
     return ({ ms: null, mp: null, fs: null, fp: null });
 }
 
-export function emptyWord(): CompleteAdmin {
+export function emptyWord(funzione: number = 1): CompleteAdmin {
     return ({
         parola: "",
         traduzione: "",
-        funzione: 1,
+        //@ts-ignore
+        funzione,
         ordine: 0,
         descrizione: "",
         esempi: null,
         collegamenti: null,
-        radice: "",
-        declinazione: emptyDeclinazione(),
-        coniugazione: null
+        radice: funzione > 4 ? null : "",
+        declinazione: funzione < 4 ? emptyDeclinazione() : null,
+        coniugazione: funzione === 4 ? emptyConiugazione() : null
     });
 }
 
