@@ -5,6 +5,10 @@
     $: reload = $page.url.pathname === "/admin/dizionario"
 </script>
 
+<svelte:head>
+    <title>Errore | Dizionario Perinaldese</title>
+</svelte:head>
+
 <div>
     <h1>{$page.status}</h1>
     <p>
