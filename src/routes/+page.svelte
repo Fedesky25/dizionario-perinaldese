@@ -7,11 +7,17 @@
     import type { PageData } from "./$types";
 	import { goto } from "$app/navigation";
 	import { getSearchFilter } from "$lib/words/utils";
+	import { wait } from "$lib/timing";
 
     export let data: PageData;
 
     let rolling = false;
-    function random() {}
+    async function roll() {
+        if(rolling) return;
+        rolling = true;
+        await wait(801);
+        rolling = false;
+    }
 
     let retrieving = false;
     async function select(id: number|null, parola: string) {
@@ -74,8 +80,8 @@
                 <p slot="empty">Clicca sul dado per vedere una parola casuale</p>
             </Search>
         </label>
-        <button on:click={random} class:rolling>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1.3rem" height="1.3rem">
+        <a href="/?casuale" data-sveltekit-preload-data="off" on:click={roll}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1.3rem" height="1.3rem" class:rolling>
                 <rect width="100" height="100" fill="currentColor" rx="20" ry="20" />
                 <circle cx="50" cy="50" r="10" fill="white" />
                 <circle cx="25" cy="25" r="10" fill="white" />
@@ -83,7 +89,7 @@
                 <circle cx="75" cy="75" r="10" fill="white" />
                 <circle cx="25" cy="75" r="10" fill="white" />
             </svg>
-        </button>
+        </a>
     </div>
     <div id="word-show">
         {#if data.error}
@@ -594,7 +600,7 @@
     .ricerca-box label:focus-within {
         border-bottom-color: #9AB973;
     }
-    .ricerca-box button {
+    .ricerca-box a {
         position: absolute;
         right: 2.15rem;
         bottom: .35rem;
@@ -609,9 +615,9 @@
         background-color: transparent;
         border: none;
     }
-    .ricerca-box button:hover{color: #BB5E64;}
+    .ricerca-box a:hover{color: #BB5E64;}
     .ricerca-box svg {transform: rotate(20deg);}
-    .ricerca-box button.rolling svg {
+    .ricerca-box svg.rolling {
         transform: rotate(380deg); 
         transition: transform .8s cubic-bezier(.6, 0, .15, 1);
     }
