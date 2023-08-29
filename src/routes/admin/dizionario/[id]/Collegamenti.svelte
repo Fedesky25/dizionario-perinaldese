@@ -28,23 +28,20 @@
             return res.error ? [] : res.data;
         }} placeholder="Aggiungi" on:word={addWord} />
     </div>
-    {#each data as item, i (item.id)}
+    <ul>
+        {#each data as item, i (item.id)}
         <input type="hidden" {name} value={item.id}>
-        <div class="box item" transition:scale>
+        <li class="box" transition:scale={{duration: 250}}>
             <span>{item.parola}</span>
             <button data-index="{i}" on:click={remove} type="button">
                 <img src="/icons/cross.svg" alt="Rimouvi {item.parola}" />
             </button>
-        </div>
-    {/each}
+        </li>
+        {/each}
+    </ul>
 </div>
 
 <style>
-    .wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2ch;
-    }
     input {
         position: absolute;
         transform: scale(0);
@@ -55,10 +52,6 @@
         border: 2px solid var(--olivina);
         border-radius: 5rem;
         padding: .4rem .8rem;
-    }
-    .item {
-        display: flex;
-        align-items: center;
     }
     img {
         height: 1rem;
@@ -76,5 +69,17 @@
     }
     button:hover {
         background-color: #eee;
+    }
+    ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 1ch;
+    }
+    li {
+        display: flex;
+        align-items: center;
+        border-color: #bbb !important;
+        margin: .5ch;
     }
 </style>
