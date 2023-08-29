@@ -22,11 +22,11 @@
     }}>
         <div>
             <label for="email">Nome utente</label>
-            <input type="email" name="email" required title="Inserisci la mail" value={form?.email || ""} on:input={clear}>
+            <input type="email" name="email" autocomplete="email" required title="Inserisci la mail" value={form?.email || ""} on:input={clear}>
         </div>
         <div>
             <label for="password">Password</label>
-            <input type="password" name="password" required title="Inserisci la password" on:input={clear}>
+            <input type="password" name="password" autocomplete="current-password" required title="Inserisci la password" on:input={clear}>
         </div>
         <button type="submit">Invia</button>
     </form>
