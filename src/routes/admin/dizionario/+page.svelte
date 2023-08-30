@@ -160,16 +160,6 @@
     }
     .table-container {
         max-height: 100%;
-        display: flex;
-        flex-direction: column;
-        /* https://stackoverflow.com/questions/27784727/how-to-make-child-div-scrollable-when-it-exceeds-parent-height */
-    }
-    .scrollable {
-        overflow-y: scroll;
-        max-height: 100%;
-        height: 100%;
-        scrollbar-width: thin;
-        scrollbar-color: #e1e1e1 transparent;
     }
 
     table {
@@ -198,7 +188,14 @@
             column-gap: 1rem;
         }
         .interaction > a {text-align: center;}
-        .table-container {grid-row: 2;}
+        .table-container {
+            grid-row: 2;
+            overflow: scroll;
+        }
+        .scrollable {
+            width: max-content;
+        }
+
     }
     @media (min-width: 100ch) {
         .container {
@@ -237,6 +234,18 @@
             position: relative;
             align-self: start;
             height: fit-content;
+
+            
+            display: flex;
+            flex-direction: column;
+            /* https://stackoverflow.com/questions/27784727/how-to-make-child-div-scrollable-when-it-exceeds-parent-height */
+        }
+        .scrollable {
+            overflow-y: scroll;
+            max-height: 100%;
+            height: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #e1e1e1 transparent;
         }
     }
     @media (min-width: 140ch) {.container {grid-template-columns: 42ch 1fr;}}
