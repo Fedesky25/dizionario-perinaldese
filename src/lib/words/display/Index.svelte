@@ -75,7 +75,6 @@
 {/if}
 {#if word.funzione === 1 || word.funzione === 2 || word.funzione === 3}
     <h3>Declinazione</h3>
-    <!-- @ts-ignore -->
     <DeclinazioneTag radice={word.radice} data={word.declinazione} />
 {:else if word.funzione === 4}
     {@const coniugazione = coniuga(word.radice, word.coniugazione)}
@@ -85,7 +84,7 @@
             <h4>Tempi infiniti</h4>
             <ul>
                 <li>Infinito presente: {word.parola}</li>
-                <li>Ferundio presente: {coniugazione.gerundio}</li>
+                <li>Gerundio presente: {coniugazione.gerundio}</li>
                 <li>
                     <span>Participio passato:</span>
                     {#if coniugazione.avere}

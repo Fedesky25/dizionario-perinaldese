@@ -18,7 +18,7 @@
         <td>{data.fs ? formatta(radice, data.fs) : '-'}</td>
     </tr>
     <tr>
-        <th scope="row">singolare</th>
+        <th scope="row">plurale</th>
         <td>{data.mp ? formatta(radice, data.mp) : '-'}</td>
         <td>{data.fp ? formatta(radice, data.fp) : '-'}</td>
     </tr>
