@@ -48,7 +48,7 @@
             else id = await createWord(word, data.supabase);
             await updateCollegamenti(id, formData, data.supabase);
             form = { success: true };
-            if(id) goto("/admin/dizionario");
+            if(data.id) goto("/admin/dizionario");
             else data.parola = emptyWord(funzione); 
         }
         catch(err) {
