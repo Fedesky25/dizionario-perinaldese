@@ -150,13 +150,13 @@
     <h2>Il progetto</h2>
     <div class="text">
         <p>Il <i>dizionario pȓeiñaudencu</i> consiste nella raccolta di quanti possibili vocaboli del perinaldese, variante della lingua ligure di Perinaldo, paesino in provincia di Imperia al confine francese. Vengono gradualmenti registrati i lessemi sia comuni che più desueti, con attenzione al contesto agricolo in cui nacque Perinaldo e la sua parlata.</p>
-        <p>Gli obbiettivi finali, seppur inizialmente individuabili nella sola creazione di una app android, sono ora molteplici e mirati alla facile fruizione del vocabolario stesso, sia su mobile offline e sia online su ogni dispositivo.</p>
+        <p>Gli obbiettivi finali, seppur inizialmente individuabili nella sola creazione di una app android, sono ora molteplici e mirati alla facile fruizione del vocabolario stesso su ogni dispositivo.</p>
         <ul>
             <li>Vocabolario online ricco di descrizioni, esempi, declinazioni e coniugazioni</li>
             <li>Futura sezione riguardo detti e modi di dire</li>
             <li>Sezione dedicata alla grammatica, in particolare morfologia e fonologia</li>
         </ul>
-        <p>Il team dietro al progetto è composto da due ragazzi dalle origini perinaldesi che, innamoratisi del paese e della sua cultura, hanno deciso di creare e proporre un vocabolario digitale ricco e più completo possibile. Siamo Federico e Francesco che, sfruttando le conoscenze infomatiche dell'uno e storico-linguistiche dell'altro, raccogliamo parole, frasi, detti dei nostri parenti perinaldesi e tanti altri abitanti del paese.</p>
+        <p>Il team dietro al progetto è composto da due ragazzi dalle origini perinaldesi che, innamoratisi del paese e della sua cultura, hanno deciso di creare e proporre un vocabolario digitale ricco e più completo possibile. Siamo Federico e Francesco che, sfruttando le conoscenze informatiche dell'uno e storico-linguistiche dell'altro, raccogliamo parole, frasi, detti dei nostri parenti perinaldesi e tanti altri abitanti del paese.</p>
         <p>Infine, il progetto vuole essere un dolce tributo alle nostre nonne, Paola Guglielmi e Angela Borgogno, per noi fonte in primis di insostituibile compagnia e in secundis di molti e ricercati termini perinaldesi. A loro è volto un sincero ringraziamento.</p>
     </div>
 </section>
