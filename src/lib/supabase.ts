@@ -284,6 +284,15 @@ export interface Database {
           coniugazione: Json
         }[]
       }
+      problemi: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          parola: string
+          traduzioni: string[]
+          ids: number[]
+          tipo: number
+        }[]
+      }
       riassunto: {
         Args: {
           numero?: number
