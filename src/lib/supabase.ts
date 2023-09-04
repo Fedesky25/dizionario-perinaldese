@@ -221,6 +221,12 @@ export interface Database {
         }
         Returns: undefined
       }
+      aggiorna_ordini: {
+        Args: {
+          id_parole: number[]
+        }
+        Returns: undefined
+      }
       casuale: {
         Args: Record<PropertyKey, never>
         Returns: {
