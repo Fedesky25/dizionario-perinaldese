@@ -186,39 +186,41 @@ export function getDefaultSuffissiImperativo(riflessivo: boolean, numero: Numero
 }
 
 export function operateWithSuffix<T extends string[]>(operazione: OperazioneConiugazione, arr: T): T {
-    const res = new Array<string>(arr.length) as T;
+    const len = arr.length;
+    const res = new Array<string>(len) as T;
     switch(operazione) {
         case OperazioneConiugazione.del_I:
-            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? '<' : '|') + arr[i];
+            for(var i=0; i<len; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? '<' : '|') + arr[i];
             break;
         case OperazioneConiugazione.del_H:
-            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(arr[i], 'a', 'u') ? '<' : '|') + arr[i];
+            for(var i=0; i<len; i++) res[i] = (startsWithTheseChars(arr[i], 'a', 'u') ? '<' : '|') + arr[i];
             break;
         case OperazioneConiugazione.add_H:
-            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? '|h' : '|') + arr[i];
+            for(var i=0; i<len; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? '|h' : '|') + arr[i];
             break;
         default:
-            for(var i=0; i<6; i++) res[i] = '|' + arr[i];
+            for(var i=0; i<len; i++) res[i] = '|' + arr[i];
             break;
     }
     return res;
 }
 
 export function operateWithRadice<T extends string[]>(radice: string, operazione: OperazioneConiugazione, arr: T): T {
-    const res = new Array<string>(arr.length);
+    const len = arr.length;
+    const res = new Array<string>(len);
     const cutted = radice.slice(0,-1);
     switch(operazione) {
         case OperazioneConiugazione.del_I:
-            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? cutted : radice) + arr[i];
+            for(var i=0; i<len; i++) res[i] = (startsWithTheseChars(arr[i], 'e', 'i') ? cutted : radice) + arr[i];
             break;
         case OperazioneConiugazione.del_H:
-            for(var i=0; i<6; i++) res[i] = (startsWithTheseChars(arr[i], 'a', 'u') ? cutted : radice) + arr[i];
+            for(var i=0; i<len; i++) res[i] = (startsWithTheseChars(arr[i], 'a', 'u') ? cutted : radice) + arr[i];
             break;
         case OperazioneConiugazione.add_H:
-            for(var i=0; i<6; i++) res[i] = radice + (startsWithTheseChars(arr[i], 'e', 'i') ? 'h' : '') + arr[i];
+            for(var i=0; i<len; i++) res[i] = radice + (startsWithTheseChars(arr[i], 'e', 'i') ? 'h' : '') + arr[i];
             break;
         default:
-            for(var i=0; i<6; i++) res[i] = radice + arr[i];
+            for(var i=0; i<len; i++) res[i] = radice + arr[i];
             break;
     }
     return res as T;
