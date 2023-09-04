@@ -24,7 +24,6 @@ function zip(ids: number[], traduzioni: string[]) {
 }
 
 export const load: PageLoad = async ({ parent }) => {
-    console.log("problemi");
     const { supabase } = await parent();
     const res = await supabase.rpc("problemi");
     if(res.error) throw postgresError2HTTPError(res.error);
