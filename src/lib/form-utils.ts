@@ -12,6 +12,12 @@ export class InvalidField extends Error {
         this.expected = expected
         this.got = got;
     }
+
+    toString() {
+        const base = `${this.field} deve essere ${this.expected}`;
+        if(this.got) return base + ", ma ottenuto " + this.got;
+        else return base;
+    }
 }
 
 export function datoInvalido(msg: string): never {
@@ -21,40 +27,52 @@ export function datoInvalido(msg: string): never {
 
 
 type FormError = InvalidField|string|null;
-interface FormStoreData {
+interface FormStoreData<T> {
     submitting: boolean;
     error: FormError;
+    who: T|null;
 }
-interface FormStore extends Readable<FormStoreData> {
+interface FormStore<T> extends Readable<FormStoreData<T>> {
     submit: SubmitFunction;
-    get value(): FormStoreData;
+    get value(): FormStoreData<T>;
     reset(): void;
 }
 
-export function clientFormHandler(fn: (data: FormData) => Promise<void>): FormStore {
+export function clientFormHandler<T = null>(
+    get_who: ((arg: {data: FormData, element: HTMLFormElement}) => T)|null,
+    fn: (data: FormData, who: T) => Promise<void>,
+): FormStore<T>
+{
     let submitting = false;
     let error: FormError = null;
-    const { set, subscribe } = writable<{submitting: boolean, error: FormError}>({submitting, error});
-    const submit: SubmitFunction = async ({ cancel, formData }) => {
+    let who: T|null = null;
+    const { set, subscribe } = writable<FormStoreData<T>>({submitting, error, who});
+    const submit: SubmitFunction = async ({ cancel, formData, formElement }) => {
         cancel();
         if(submitting) return;
         submitting = true;
-        set({submitting, error});
-        try { await fn(formData); }
+        try {
+            who = get_who ? get_who({data: formData, element: formElement}) : null;
+            set({submitting, error, who});
+            //@ts-ignore
+            await fn(formData, who);
+            error = null;
+        }
         catch(err) {
             if(err instanceof InvalidField) error = err;
             else error = err + '';
         }
         submitting = false;
-        set({submitting, error});
+        who = null;
+        set({submitting, error, who});
     }
     return {
         subscribe,
         submit,
-        get value() { return {submitting, error} },
+        get value() { return {submitting, error, who} },
         reset() {
             error = null;
-            set({submitting, error});
+            set({submitting, error, who});
         }
     }
 }

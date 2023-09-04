@@ -11,23 +11,23 @@
     let remove: Modal;
     let removing: {id: number, parola: string, traduzione: string}|null = null;
 
-    const single = clientFormHandler(async (formData) => {
+    const single = clientFormHandler(null, async (formData) => {
         const ids = getIntList(formData, "id");
         const res = await data.supabase.from("parole").update({ordine: 0}).in("id", ids);
         if(res.error) throw res.error.details;
         else data.single = [];
     });
 
-    let considered = -1;
-    const multiple = clientFormHandler(async (formData: FormData) => {
-        considered = getInt(formData, "index");
-        const id_parole = getIntList(formData, "id");
-        const res = await data.supabase.rpc("aggiorna_ordini", {id_parole});
-        if(res.error) throw res.error.details;
-        data.multiple.splice(considered, 1);
-        data.multiple = data.multiple;
-        considered = -1;
-    });
+    const multiple = clientFormHandler(
+        ({element}) => +(element.dataset.index||0),
+        async (formData, index) => {
+            const id_parole = getIntList(formData, "id");
+            const res = await data.supabase.rpc("aggiorna_ordini", {id_parole});
+            if(res.error) throw res.error.details;
+            data.multiple.splice(index, 1);
+            data.multiple = data.multiple;
+        }
+    );
 
     function onsingle(e: CustomEvent<{extra: number, id: number, traduzione: string}>) {
         const i = e.detail.extra;
@@ -56,7 +56,7 @@
             {#each data.multiple as word, index (word.parola)}
                 {@const formID = `multipla-${word.parola}`}
                 <div class="parola">{word.parola}</div>
-                <form id={formID} action="?/multipla" method="post" use:enhance={multiple.submit}>
+                <form id={formID} action="?/multipla" method="post" data-index={index} use:enhance={multiple.submit}>
                     <input type="hidden" name="index" value={index}>
                     <SortableList 
                         extra={index} 
@@ -68,7 +68,7 @@
                         on:single={onsingle} />
                 </form>
                 <div class="last">
-                    {#if index === considered}
+                    {#if index === $multiple.who}
                     <Loading />
                     {:else}
                     <button type="submit" form={formID} disabled={$multiple.submitting}>Invia</button>
