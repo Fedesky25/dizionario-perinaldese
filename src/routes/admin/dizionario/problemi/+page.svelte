@@ -48,6 +48,7 @@
 
 <main>
     <h1>Problemi</h1>
+    {#if data.multiple.length > 0}
     <section>
         <h2>Ordine delle definizioni multiple</h2>
         <p>Queste parole hanno più traduzioni con errori nel loro ordine: alcuni hanno lo stesso valore di ordine o hanno valore di ordine nullo.</p>
@@ -84,6 +85,7 @@
             }</p>
         {/if}
     </section>
+    {/if}
     {#if data.single.length > 0}
     <section>
         <h2>Definizione singola</h2>
