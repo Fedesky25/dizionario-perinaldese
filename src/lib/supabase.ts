@@ -144,6 +144,96 @@ export interface Database {
         }
         Relationships: []
       }
+      link_proverbi_parole: {
+        Row: {
+          id: number
+          indice: number
+          parola: number
+          proverbio: number
+        }
+        Insert: {
+          id?: number
+          indice: number
+          parola: number
+          proverbio: number
+        }
+        Update: {
+          id?: number
+          indice?: number
+          parola?: number
+          proverbio?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_proverbi_parole_parola_fkey"
+            columns: ["parola"]
+            referencedRelation: "parole"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "link_proverbi_parole_proverbio_fkey"
+            columns: ["proverbio"]
+            referencedRelation: "proverbi"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      link_tags_parole: {
+        Row: {
+          parola: number
+          tag: number
+        }
+        Insert: {
+          parola: number
+          tag: number
+        }
+        Update: {
+          parola?: number
+          tag?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_tags_parole_parola_fkey"
+            columns: ["parola"]
+            referencedRelation: "parole"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "link_tags_parole_tag_fkey"
+            columns: ["tag"]
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      link_tags_proverbi: {
+        Row: {
+          proverbio: number
+          tag: number
+        }
+        Insert: {
+          proverbio: number
+          tag: number
+        }
+        Update: {
+          proverbio?: number
+          tag?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_tags_proverbi_proverbio_fkey"
+            columns: ["proverbio"]
+            referencedRelation: "proverbi"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "link_tags_proverbi_tag_fkey"
+            columns: ["tag"]
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       parole: {
         Row: {
           coniugazione: number | null
@@ -207,6 +297,54 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      proverbi: {
+        Row: {
+          commenti_fine: number[] | null
+          commenti_inizio: number[] | null
+          commenti_testo: string[] | null
+          creazione: string
+          id: number
+          letterale: string
+          originale: string
+          significato: string | null
+        }
+        Insert: {
+          commenti_fine?: number[] | null
+          commenti_inizio?: number[] | null
+          commenti_testo?: string[] | null
+          creazione?: string
+          id?: number
+          letterale: string
+          originale: string
+          significato?: string | null
+        }
+        Update: {
+          commenti_fine?: number[] | null
+          commenti_inizio?: number[] | null
+          commenti_testo?: string[] | null
+          creazione?: string
+          id?: number
+          letterale?: string
+          originale?: string
+          significato?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          id: number
+          nome: string
+        }
+        Insert: {
+          id?: number
+          nome: string
+        }
+        Update: {
+          id?: number
+          nome?: string
+        }
+        Relationships: []
       }
     }
     Views: {
