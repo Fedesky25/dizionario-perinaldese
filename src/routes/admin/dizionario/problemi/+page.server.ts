@@ -9,6 +9,14 @@ export const actions: Actions = {
         const ids = getIntList(data, "id");
         const res = await client.from("parole").update({ordine: 0}).in("id", ids);
         if(res.error) throw postgresError2HTTPError(res.error);
-        return { success: true }
+        return { success: true };
+    },
+    multipla: async ({ request, locals }) => {
+        const client = locals.supabase;
+        const data = await request.formData()
+        const id_parole = getIntList(data, "id");
+        const res = await client.rpc("aggiorna_ordini", {id_parole});
+        if(res.error) throw postgresError2HTTPError(res.error);
+        return {success: true};
     }
 };
