@@ -1,9 +1,10 @@
 import { redirect, type Handle } from "@sveltejs/kit";
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit";
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY } from "$env/static/public";
+import type { Database } from "$lib/supabase";
 
 export const handle: Handle = async ({ event, resolve }) => {
-    const supabase = createSupabaseServerClient({
+    const supabase = createSupabaseServerClient<Database>({
         supabaseUrl: PUBLIC_SUPABASE_URL,
         supabaseKey: PUBLIC_SUPABASE_KEY,
         event, 
