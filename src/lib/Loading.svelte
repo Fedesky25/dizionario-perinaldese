@@ -4,6 +4,7 @@
 
 <style>
     .track {
+        margin: var(--loading-margin, 0 auto);
         width: var(--loading-width, 100%);
         background-color: #ccc;
         height: .125rem;
