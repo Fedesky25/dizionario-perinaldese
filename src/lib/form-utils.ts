@@ -9,6 +9,7 @@ export class InvalidField extends Error {
         super();
         this.field = field;
         this.expected = expected
+        this.got = got;
     }
 }
 
