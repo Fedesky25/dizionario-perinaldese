@@ -6,10 +6,8 @@
     const dispatch = createEventDispatcher<{
         single: {
             extra: T, 
-            item: {
-                id: number,
-                traduzione: string
-            }
+            id: number,
+            traduzione: string
         }
     }>();
 
@@ -28,7 +26,13 @@
         items = items;
     }
 
-    function onsingle() {dispatch("single", {extra, item: items[0]})}
+    function onsingle() {
+        dispatch("single", {
+            extra, 
+            id: items[0].id,
+            traduzione: items[0].traduzione
+        });
+    }
     $: if(items.length === 1) onsingle();
 </script>
 
@@ -39,6 +43,7 @@ on:finalize={e => {items = e.detail.items}}
 >
 {#each items as s,i (s.id)}
     <li animate:flip={{duration: flipDurationMs}}>
+        <input type="hidden" name="id" value={s.id}>
         <a href="/?parola={s.id}" target="_blank">{s.traduzione}</a>
         <button type="button" data-index={i} on:click={remove}>
             <img src="/icons/delete.svg" alt="rimuovi">
@@ -52,7 +57,6 @@ on:finalize={e => {items = e.detail.items}}
         display: flex;
         flex-direction: column;
         gap: .5rem;
-        margin-right: .7rem;
         padding: .3rem;
     }
     li {
