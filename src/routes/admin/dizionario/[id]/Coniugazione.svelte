@@ -78,6 +78,13 @@
         transform: scale(0);
         opacity: 0;
     }
+    select {
+        border: 1px solid #ccc;
+        border-radius: .15rem;
+        padding: .3rem .6rem;
+        font: inherit;
+        background-color: white;
+    }
     .info {
         padding: 1rem;
         display: grid;

@@ -218,7 +218,7 @@
     input, select,
     :global(textarea) {
         border: 1px solid #ccc;
-        border-radius: .2rem;
+        border-radius: .15rem;
         padding: .3rem .6rem;
         font: inherit;
         background-color: white;
