@@ -1,4 +1,5 @@
-import { error } from "@sveltejs/kit";
+import { error, type SubmitFunction } from "@sveltejs/kit";
+import { writable, type Readable } from "svelte/store";
 
 export class InvalidField extends Error {
     public readonly field: string;
@@ -16,6 +17,48 @@ export class InvalidField extends Error {
 export function datoInvalido(msg: string): never {
     throw error(400, { message: "Dato non valido", details: msg });
 }
+
+
+
+type FormError = InvalidField|string|null;
+interface FormStoreData {
+    submitting: boolean;
+    error: FormError;
+}
+interface FormStore extends Readable<FormStoreData> {
+    submit: SubmitFunction;
+    get value(): FormStoreData;
+    reset(): void;
+}
+
+export function clientFormHandler(fn: (data: FormData) => Promise<void>): FormStore {
+    let submitting = false;
+    let error: FormError = null;
+    const { set, subscribe } = writable<{submitting: boolean, error: FormError}>({submitting, error});
+    const submit: SubmitFunction = async ({ cancel, formData }) => {
+        cancel();
+        if(submitting) return;
+        submitting = true;
+        set({submitting, error});
+        try { await fn(formData); }
+        catch(err) {
+            if(err instanceof InvalidField) error = err;
+            else error = err + '';
+        }
+        submitting = false;
+        set({submitting, error});
+    }
+    return {
+        subscribe,
+        submit,
+        get value() { return {submitting, error} },
+        reset() {
+            error = null;
+            set({submitting, error});
+        }
+    }
+}
+
 
 export function getMandatoryString(data: FormData, key: string) {
     const v = data.get(key);
