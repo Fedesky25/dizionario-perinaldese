@@ -29,6 +29,10 @@
     );
 </script>
 
+<svelte:head>
+    <title>Etichette | Dizionario Perinaldese</title>
+</svelte:head>
+
 <div class="padded">
     <h1>Etichette</h1>
     <form action="?/create" method="post" use:enhance={create.submit} style="width: fit-content;">
