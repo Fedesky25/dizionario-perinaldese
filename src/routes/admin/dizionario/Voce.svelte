@@ -22,12 +22,12 @@
             <span>Modifica</span>
         </a>
         {#if !word.con_descrizione}
-            <a href="#descrizione/{word.id}/{index}">
+            <a href="#descrizione/{index}" data-sveltekit-reload>
                 <img src="/icons/description.svg" alt="Descrizione">
                 <span>Scrivi desc.</span>
             </a>
         {/if}
-        <a href="#rimuovi/{word.id}/{index}">
+        <a href="#rimuovi/{index}" data-sveltekit-reload>
             <img src="/icons/delete.svg" alt="Rimuovi">
             <span>Rimuovi</span>
         </a>
