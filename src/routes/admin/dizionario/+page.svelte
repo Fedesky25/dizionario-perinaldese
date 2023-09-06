@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { getSearchFilter, handleSpecialChars } from "$lib/words/utils";
     import { debounceInput } from "$lib/timing";
-	import ModalForm from "$lib/ModalForm.svelte";
+	import Modal from "$lib/modal/Hashed.svelte";
 	import type { PageData } from "./$types";
     import Voce from "./Voce.svelte";
 	import { writable } from "svelte/store";
 	import type { Summary } from "$lib/words/types";
 	import Loading from "$lib/Loading.svelte";
+	import { getMandatoryString } from "$lib/form-utils";
 
     export let data: PageData;
     let words: Summary[] = data.words;
@@ -52,15 +53,10 @@
         extending = false;
     }
 
-    function addDescrizione(re: RegExpExecArray) {
-        const index = +re[2];
-        words[index].con_descrizione = true;
-    }
-
-    function rimuoviParola(re: RegExpExecArray) {
-        const index = +re[2];
-        words.splice(index, 1);
-        words = words;
+    function wordFromRegExp(arr: RegExpExecArray) {
+        const index = +arr[1];
+        const w = data.words[index];
+        return w ? { id: w.id, index, parola: w.parola, traduzione: w.traduzione } : null;
     }
 </script>
 
@@ -113,35 +109,41 @@
     </div>
 </div>
 
-<ModalForm
+<Modal
     encourage={true}
     action="?/descrizione"
-    hashRegExp={/#descrizione\/(\d+)\/(\d+)/}
-    onsuccess={addDescrizione}
+    hashRegExp={/#descrizione\/(\d+)/}
+    parse={wordFromRegExp}
+    execute={async (w, form) => {
+        const descrizione = getMandatoryString(form, "descrizione");
+        const res = await data.supabase.from("parole").update({descrizione}).eq("id", w.id);
+        if(res.error) throw res.error.details;
+        words[w.index].con_descrizione = true;
+    }}
     let:data let:titleID let:descID
 >
-    {#if words.length}
-    {@const w = words[+data[2]]}
     <h2 id={titleID}>Aggiungi una descrizione</h2>
-    <p id={descID}>La voce «{w.parola} - {w.traduzione}» non ha una descrizione: scrivila al volo qui sotto.</p>
+    <p id={descID}>La voce «<a class="home-link" href="/?parola={data.id}" target="_blank">{data.parola} - {data.traduzione}</a>» non ha una descrizione: scrivila al volo qui sotto.</p>
     <textarea cols="30" rows="6" name="descrizione" on:keydown={handleSpecialChars}></textarea>
-    <input type="hidden" name="id" value={data[1]}>
-    {/if}
-</ModalForm>
+    <input type="hidden" name="id" value={data.id}>
+</Modal>
 
-<ModalForm 
+<Modal 
     encourage={false} 
     action="?/rimuovi"
-    hashRegExp={/#rimuovi\/(\w+)\/(\d+)/}
-    onsuccess={rimuoviParola}
+    hashRegExp={/#rimuovi\/(\w+)/}
+    parse={wordFromRegExp}
+    execute={async (w) => {
+        const res = await data.supabase.from("parole").delete().eq("id",w.id);
+        if(res.error) throw res.error.details;
+        words.splice(w.index, 1);
+        words = words;
+    }}
     let:titleID let:descID let:data>
-    {#if words.length}
-    {@const w = words[+data[2]]}
-    <h2 id={titleID}>Rimozione «{w.parola}»</h2>
-    <p id={descID}>Sei sicuro di voler rimuovere la voce «{w.parola} - {w.traduzione}»?<br>L'operazione non potrà essere annullata.</p>
-    <input type="hidden" name="id" value={data[1]}>
-    {/if}
-</ModalForm>
+    <h2 id={titleID}>Rimozione «{data.parola}»</h2>
+    <p id={descID}>Sei sicuro di voler rimuovere la voce «<a class="home-link" href="/?parola={data.id}" target="_blank">{data.parola} - {data.traduzione}</a>»?<br>L'operazione non potrà essere annullata.</p>
+    <input type="hidden" name="id" value={data.id}>
+</Modal>
 
 <style>
     .container {
@@ -311,5 +313,9 @@
         align-items: center;
         justify-content: center;
         --loading-width: 30ch;
+    }
+    .home-link {
+        color: inherit;
+        text-decoration: underline dashed var(--olivina);
     }
 </style>
