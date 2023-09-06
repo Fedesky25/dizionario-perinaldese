@@ -15,6 +15,7 @@
     export let id: string|undefined = undefined;
     export let delay = 500;
     export let action: (text: string) => Promise<SearchResult[]>;
+    export let autoclear = false;
 
     const regexp = /^[\/#\?\.&\s]*([\S\s]*)$/;
     let text = writable("");
@@ -24,11 +25,16 @@
     let loading = false;
     let error = false;
     let firstTime = true;
+    let input: HTMLInputElement;
 
     function emit(index: number) {
         active = -1;
         hidden = true;
         dispatch("word", results[index]);
+        if(autoclear) {
+            $text = '';
+            input.blur();
+        }
     }
 
     $: query = regexp.exec($text)?.[1] || "";
@@ -84,6 +90,7 @@
 <div class="wrapper">
     <input type="text" {id} {placeholder}
         autocapitalize="off"
+        bind:this={input} 
         on:focus={() => {hidden = false;}}
         on:keydown={handleSpecialChars} 
         on:keydown={handleArrows} 
