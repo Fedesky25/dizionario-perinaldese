@@ -2,7 +2,7 @@
 	import type { PageData } from "./$types";
     import SortableList from "./SortableList.svelte";
     import Modal from "$lib/ConfirmModalForm.svelte";
-	import { clientFormHandler, getInt, getIntList, InvalidField } from "$lib/form-utils";
+	import { clientFormHandler, getIntList, InvalidField } from "$lib/form-utils";
 	import { enhance } from "$app/forms";
     import Loading from "$lib/Loading.svelte";
 
@@ -11,7 +11,7 @@
     let remove: Modal;
     let removing: {id: number, parola: string, traduzione: string}|null = null;
 
-    const single = clientFormHandler(null, async (formData) => {
+    const single = clientFormHandler(null, async ({formData}) => {
         const ids = getIntList(formData, "id");
         const res = await data.supabase.from("parole").update({ordine: 0}).in("id", ids);
         if(res.error) throw res.error.details;
@@ -20,11 +20,11 @@
 
     const multiple = clientFormHandler(
         ({element}) => +(element.dataset.index||0),
-        async (formData, index) => {
+        async ({formData, who}) => {
             const id_parole = getIntList(formData, "id");
             const res = await data.supabase.rpc("aggiorna_ordini", {id_parole});
             if(res.error) throw res.error.details;
-            data.multiple.splice(index, 1);
+            data.multiple.splice(who, 1);
             data.multiple = data.multiple;
         }
     );

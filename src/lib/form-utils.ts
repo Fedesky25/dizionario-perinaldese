@@ -39,23 +39,23 @@ interface FormStore<T> extends Readable<FormStoreData<T>> {
 }
 
 export function clientFormHandler<T = null>(
-    get_who: ((arg: {data: FormData, element: HTMLFormElement}) => T)|null,
-    fn: (data: FormData, who: T) => Promise<void>,
+    get_who: ((arg: {formData: FormData, element: HTMLFormElement}) => T)|null,
+    fn: (arg: {formData: FormData, element: HTMLFormElement, who: T}) => Promise<void>,
 ): FormStore<T>
 {
     let submitting = false;
     let error: FormError = null;
     let who: T|null = null;
     const { set, subscribe } = writable<FormStoreData<T>>({submitting, error, who});
-    const submit: SubmitFunction = async ({ cancel, formData, formElement }) => {
+    const submit: SubmitFunction = async ({ cancel, formData, formElement: element }) => {
         cancel();
         if(submitting) return;
         submitting = true;
         try {
-            who = get_who ? get_who({data: formData, element: formElement}) : null;
+            who = get_who ? get_who({formData, element}) : null;
             set({submitting, error, who});
             //@ts-ignore
-            await fn(formData, who);
+            await fn({formData, element, who});
             error = null;
         }
         catch(err) {
