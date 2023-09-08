@@ -8,6 +8,7 @@
 	import type { Summary } from "$lib/words/types";
 	import Loading from "$lib/Loading.svelte";
 	import { getMandatoryString } from "$lib/form-utils";
+    import Dashboard from "$lib/Dashboard.svelte";
 
     export let data: PageData;
     let words: Summary[] = data.words;
@@ -64,50 +65,48 @@
     <title>Voci del Dizionario Perinaldese</title>
 </svelte:head>
 
-<div class="container">
-    <h1>Voci del dizionario</h1>
-    <p> Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo. I risultati della ricerca compaiono man mano che si scrive.</p>
-    <div class="interaction">
+<Dashboard title="Voci del dizionario">
+    <p slot="text">Vai sopra una voce del dizionario per poterla modificare o rimuovere, o per aggiungerne una descrizione al volo. I risultati della ricerca compaiono man mano che si scrive.</p>
+    <svelte:fragment slot="interaction">
         <input type="text" placeholder="Cerca..." 
             on:keydown={handleSpecialChars} 
             use:debounceInput={{ delay: 500, store: search }}>
         <a class="btn" href="/admin/dizionario/crea">Aggiungi parola</a>
-    </div>
-    <div class="table-container">
-        <div class="scrollable">
-            <table>
-                <tr>
-                    <th>Parola</th>
-                    <th>Traduzione</th>
-                    <th>Funzione</th>
-                    <th>Desc.</th>
-                    <th>Esempi</th>
-                </tr>
-                {#each words as word, index (word.id)}
-                    <Voce {word} {index} />
-                {/each}
-            </table>
-            {#if error}
-                <div class="table-msg">
-                    <img src="/icons/cloud-error.svg" alt="Errore nel cloud"><br>
-                    <span>{error}</span>
-                </div>
-            {:else if words.length === 0}
-                <div class="table-msg">
-                    <img src="/icons/nothing-here.svg" alt="Nulla qui"><br>
-                    <span>Nessun risultato di ricerca</span>
-                </div>
-            {/if}
-            {#if extending}
-                <div class="load-wrapper">
-                    <Loading />
-                </div>
-            {:else if can_extend}
-                <button class="btn" type="button" disabled={extending} on:click={extend}>Carica altri</button>
-            {/if}
-        </div>
-    </div>
-</div>
+    </svelte:fragment>
+    <svelte:fragment slot="data">
+        <table>
+            <tr>
+                <th>Parola</th>
+                <th>Traduzione</th>
+                <th>Funzione</th>
+                <th>Desc.</th>
+                <th>Esempi</th>
+            </tr>
+            {#each words as word, index (word.id)}
+                <Voce {word} {index} />
+            {/each}
+        </table>
+        {#if error}
+            <div class="table-msg">
+                <img src="/icons/cloud-error.svg" alt="Errore nel cloud"><br>
+                <span>{error}</span>
+            </div>
+        {:else if words.length === 0}
+            <div class="table-msg">
+                <img src="/icons/nothing-here.svg" alt="Nulla qui"><br>
+                <span>Nessun risultato di ricerca</span>
+            </div>
+        {/if}
+        {#if extending}
+            <div class="load-wrapper">
+                <Loading />
+            </div>
+        {:else if can_extend}
+            <button class="btn" type="button" disabled={extending} on:click={extend}>Carica altri</button>
+        {/if}
+    </svelte:fragment>
+
+</Dashboard>
 
 <Modal
     encourage={true}
@@ -146,111 +145,15 @@
 </Modal>
 
 <style>
-    .container {
-        overflow: hidden;
-        background-color: #f8f8f8;
-        display: grid;
-        width: 100%;
-        max-width: 100%;
-        height: 100dvh;
-        overflow: hidden;
-    }
-    .interaction {display: flex;}
-    .interaction > a {
-        display: block;
+    a {
         text-decoration: none;
     }
-    .table-container {
-        max-height: 100%;
-    }
-
     table {
         width: 100%;
         border-spacing: 0;
         /* border-collapse: collapse; */
     }
-    @media (max-width: 100ch) {
-        .container {
-            position: absolute;
-            inset: 0;
-            grid-template-rows: auto 1fr auto;
-        }
-        h1 {
-            grid-row: 1;
-            padding: .5rem;
-            text-align: center;
-        }
-        p {display: none;}
-        .interaction {
-            background-color: white;
-            padding: .5rem 1rem;
-            box-shadow: 0 0 25px #0001;
-            grid-row: 3;
-            justify-content: space-between;
-            column-gap: 1rem;
-        }
-        .interaction > a {text-align: center;}
-        .table-container {
-            grid-row: 2;
-            overflow: scroll;
-        }
-        .scrollable {
-            width: max-content;
-        }
 
-    }
-    @media (min-width: 100ch) {
-        .container {
-            max-height: 100vh;
-            grid-template-columns: 32ch 1fr;
-            grid-template-rows: repeat(3, auto) 1fr;
-            row-gap: 1rem;
-            column-gap: 1rem;
-            padding: 2.5rem;
-            /* padding-bottom: 3rem; */
-        }
-        h1 {grid-row: 1;}
-        p {
-            grid-row: 2;
-            margin-bottom: 1rem;
-        }
-        .interaction {
-            grid-row: 3;
-            flex-direction: column;
-        }
-        .interaction > :global(*) {
-            width: fit-content;
-            margin: .5rem 0;
-        }
-        h1, p, .interaction {grid-column: 1;}
-        .table-container {
-            grid-column: 2;
-            grid-row: 1/6;
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 0 45px #0001;
-            padding: 1rem;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 80ch;
-            position: relative;
-            align-self: start;
-            height: fit-content;
-
-            
-            display: flex;
-            flex-direction: column;
-            /* https://stackoverflow.com/questions/27784727/how-to-make-child-div-scrollable-when-it-exceeds-parent-height */
-        }
-        .scrollable {
-            overflow-y: scroll;
-            max-height: 100%;
-            height: 100%;
-            scrollbar-width: thin;
-            scrollbar-color: #e1e1e1 transparent;
-        }
-    }
-    @media (min-width: 140ch) {.container {grid-template-columns: 42ch 1fr;}}
     th {
         border-bottom: 2px solid var(--olivina);
         padding: .5rem 1ch;
