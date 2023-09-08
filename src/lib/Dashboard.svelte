@@ -31,6 +31,7 @@
         height: 100dvh;
         overflow: hidden;
     }
+    .interaction {display: flex;}
     .table-container {
         max-height: 100%;
     }
@@ -81,6 +82,8 @@
         .interaction {
             grid-row: 3;
             flex-direction: column;
+            align-items: start;
+            row-gap: 1rem;
         }
         h1, .text, .interaction {grid-column: 1;}
         .table-container {
