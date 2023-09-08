@@ -50,6 +50,7 @@ export function handleSpecialChars(this: HTMLInputElement|HTMLTextAreaElement, e
     const start = this.selectionStart!, end = this.selectionEnd!;
     this.value = txt.slice(0, start) + specialChars[(e.key as keyof typeof specialChars)] + txt.slice(end);
     this.setSelectionRange(start+1, start+1);
+    this.dispatchEvent(new Event("input", {bubbles: true}));
 }
 
 const REtests = {
