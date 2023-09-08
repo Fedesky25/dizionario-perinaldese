@@ -13,6 +13,8 @@
         }
     }
 
+    $: if(show) location.hash = hash;
+
     function exit() { 
         if(!show) return;
         history.back(); 
