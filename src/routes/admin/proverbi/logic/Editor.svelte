@@ -70,7 +70,8 @@
 <style>
     form {
         padding: 1rem;
-        margin-top: 2rem;
+        padding-top: 2rem;
+        background-color: white;
     }
     .body {
         margin-bottom: 40vh;
@@ -120,10 +121,11 @@
             justify-items: center;
         }
         form {
-            margin-top: 8rem;
+            padding-top: 8rem;
             display: grid;
             grid-template-columns: 1fr minmax(50rem, 120ch) 1fr;
             column-gap: 4rem;
+            width: 100%;
         }
         .btns {
             justify-self: end;
