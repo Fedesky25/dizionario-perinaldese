@@ -42,14 +42,18 @@ export function emptyProverbio(): Proverbio {
     }
 }
 
+function nullIfEmpty<T>(arr: T[]): T[]|null {
+    return arr.length ? arr : null;
+}
+
 export function getProverbio(data: FormData) {
     const originale = getMandatoryString(data, "originale");
     const letterale = getMandatoryString(data, "letterale");
     const significato = getStringOrNull(data, "significato");
 
-    const commenti_inizio = getIntList(data, "commenti-inizio");
-    const commenti_fine = getIntList(data, "commenti-fine");
-    const commenti_testo = getStringList(data, "commenti-testo");
+    const commenti_inizio = nullIfEmpty(getIntList(data, "commenti-inizio"));
+    const commenti_fine = nullIfEmpty(getIntList(data, "commenti-fine"));
+    const commenti_testo = nullIfEmpty(getStringList(data, "commenti-testo"));
 
     
     return {
