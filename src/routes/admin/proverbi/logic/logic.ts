@@ -28,10 +28,10 @@ function findPrevious(arr: WordInfo[], piece: string, from: number) {
 type WordLink = {indice: number, id: number, parola: string};
 
 function findLastLink(arr: WordLink[], index: number) {
-    if(arr.length === 0) return -1;
+    if(!arr.length) return -1;
     let i = Math.min(arr.length-1, index);
-    while(arr[i].indice > index) i--;
-    return i < 0 ? -1 : arr[i].indice === index ? i : -1;
+    while(i > 0 && arr[i].indice > index) i--;
+    return arr[i].indice === index ? i : -1;
 }
 
 export function wordLinks(text: string) {
@@ -40,7 +40,6 @@ export function wordLinks(text: string) {
     const { set, subscribe } = writable(last_links);
 
     function impose(arr: WordLink[]) {
-        console.log(arr);
         last_links = splitIntoWords(last_text).map((piece, i) => {
             const j = findLastLink(arr, i);
             return j === -1 

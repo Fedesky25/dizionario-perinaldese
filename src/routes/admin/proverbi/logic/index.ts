@@ -65,15 +65,15 @@ export function getProverbio(data: FormData) {
 function findLastIndex(arr: number[], index: number) {
     if(arr.length === 0) return -1;
     let i = Math.min(index, arr.length-1);
-    while(arr[i] > index) i--;
-    return i < 0 ? -1 : arr[i] === index ? i : -1;
+    while(i > 0 &&arr[i] > index) i--;
+    return arr[i] === index ? i : -1;
 }
 
 function findLastOld(arr: {indice: number}[], index: number) {
     if(!arr.length) return -1;
     let i = Math.min(index, arr.length-1);
-    while(arr[i].indice > index) i--;
-    return i < 0 ? -1 : arr[i].indice === index ? i : -1;
+    while(i > 0 && arr[i].indice > index) i--;
+    return arr[i].indice === index ? i : -1;
 }
 
 
