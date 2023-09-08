@@ -4,7 +4,7 @@
 	import { clientFormHandler } from "$lib/form-utils";
 	import Loading from "$lib/Loading.svelte";
 
-    export let encourage = true;
+    export let encourage = false;
     export let hashRegExp: RegExp;
     export let action: string;
     export let parse: (arr: RegExpExecArray) => T|null;
@@ -129,7 +129,7 @@
         position: fixed;
         top: 50%;
         left: 50%;
-        width: fit-content;
+        width: var(--modal-width, fit-content);
         max-width: 90vw;
         max-height: 90vh;
         overflow-y: auto;
