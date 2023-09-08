@@ -19,7 +19,7 @@
         if(!can_extend) return;
         const len = data.proverbi.length;
         const res = await data.supabase.from("proverbi")
-            .select("id, originale")
+            .select("id, originale, letterale")
             .order("creazione", {ascending: false})
             .range(len, len+49);
         if(res.error) setError(res.error.details);
@@ -32,16 +32,21 @@
 </script>
 
 <Dashboard title="Proverbi">
-    <div slot="interaction">
-
+    <div slot="text">
+        <p>Clicca su una voce a fianco per modificare il proverbio o effettua una ricerca tra proverbi selezionando delle etichette.</p>
     </div>
+    <a slot="interaction" href="/admin/proverbi/crea" class="btn">Aggiungi proverbio</a>
     <svelte:fragment slot="data">
         <ul>
             {#each data.proverbi as p, i}
                 <li>
-                    <a href="/admin/proverbi/{p.id}" class="originale">{p.originale}</a>
+                    <a href="/admin/proverbi/{p.id}" class="originale">
+                        <span>{p.originale}</span>
+                        <br>
+                        <span class="obl">{p.letterale}</span>
+                    </a>
                     <a href="#rimuovi/{i}" class="delete" data-sveltekit-reload>
-                        <img src="/icons/delete.svg" alt="Rimuovi">
+                        <img src="/icons/cross.svg" alt="Rimuovi">
                     </a>
                 </li>
             {/each}
@@ -51,7 +56,7 @@
         {:else if extending}
             <Loading />
         {:else if can_extend}
-            <button type="button" on:click={extend}>Carica altri</button>
+            <button type="button" class="btn" on:click={extend}>Carica altri</button>
         {/if}
     </svelte:fragment>
 </Dashboard>
@@ -78,5 +83,57 @@
 </Modal>
 
 <style>
-
+    :root {
+        --modal-width: 45ch;
+    }
+    .btn {
+        padding: .5rem 1rem;
+        border-radius: .2rem;
+        font-weight: 500;
+        border: none;
+        background-color: var(--olivina);
+        font-size: 1rem;
+        color: white;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    li {
+        display: flex;
+        align-items: center;
+        padding: .3rem .55rem;
+        border-radius: .3rem;
+    }
+    li:hover {
+        background-color: #f7f7f7;
+    }
+    li + li {
+        margin-top: .2rem;
+    }
+    .originale {
+        flex-grow: 1;
+        text-decoration: none;
+        color: inherit;
+    }
+    .obl {
+        font-style: italic;
+        color: #777;
+    }
+    img {
+        height: 1rem;
+        width: 1rem;
+        display: block;
+    }
+    .delete {
+        margin-left: 2ch;
+    }
+    @media (min-width: 50rem) {
+        .delete {
+            transform: scale(0);
+            transition: transform 50ms ease;
+        }
+        li:hover .delete {
+            transform: scale(1);
+        }
+    }
 </style>
