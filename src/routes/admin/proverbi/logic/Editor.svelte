@@ -14,6 +14,14 @@
     export let submit: SubmitFunction;
     export let client: SupabaseClient<Database>;
     export let data: Proverbio;
+
+    let originale: string;
+    let letterale: string;
+    $: destructure(data);
+    function destructure(d: Proverbio) {
+        originale = d.originale;
+        letterale = d.letterale;
+    }
     
     $: valid = data.originale.length > 0 && data.letterale.length > 0;
 </script>
@@ -37,16 +45,16 @@
             <h2>Testo</h2>
             <div class="three">
                 <span>Originale</span>
-                <textarea name="originale" rows="2" bind:value={data.originale} on:keydown={handleSpecialChars}></textarea>
+                <textarea name="originale" rows="2" bind:value={originale} on:keydown={handleSpecialChars}></textarea>
                 <span>Letterale</span>
-                <textarea name="letterale" rows="2" bind:value={data.letterale} on:keydown={handleSpecialChars}></textarea>
+                <textarea name="letterale" rows="2" bind:value={letterale} on:keydown={handleSpecialChars}></textarea>
                 <span>Significato</span>
                 <textarea name="significato" rows="2" value={data.significato||''} on:keydown={handleSpecialChars}></textarea>
             </div>
         </section>
         <section>
             <h2>Link a parole</h2>
-            <Links {client} text={data.originale} words={data.parole||[]} />
+            <Links {client} text={originale} words={data.parole||[]} />
         </section>
         <section>
             <h2>Etichette</h2>
@@ -54,7 +62,7 @@
         </section>
         <section>
             <h2>Commenti</h2>
-            <Commenti testo={data.commenti_testo||[]} inizio={data.commenti_inizio||[]} fine={data.commenti_fine||[]} text={data.originale} />
+            <Commenti testo={data.commenti_testo||[]} inizio={data.commenti_inizio||[]} fine={data.commenti_fine||[]} text={originale} />
         </section>
     </div>
 </form>
