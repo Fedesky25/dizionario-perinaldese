@@ -372,6 +372,12 @@ export interface Database {
           parola: string
         }[]
       }
+      ottieni_proverbio: {
+        Args: {
+          id_proverbio: number
+        }
+        Returns: Record<string, unknown>
+      }
       parola_admin: {
         Args: {
           id_parola: number
