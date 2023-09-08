@@ -6,19 +6,21 @@
 
     export let data: PageData;
 
+    let editor_data = emptyProverbio();
+
     const handler = clientFormHandler(null, async ({ formData, element }) => {
         const proverbio = getProverbio(formData);
         const id = getDataOrThrow(await data.supabase.from("proverbi").insert(proverbio).select("id"))[0].id;
         await updateTags(id, formData, [], data.supabase);
         await updateLinks(id, formData, data.supabase);
-        element.reset();
+        editor_data = emptyProverbio();
     });
 </script>
 
 <Editor 
     id={null}
     client={data.supabase} 
-    data={emptyProverbio()}
+    data={editor_data}
     submit={handler.submit}  />
 
 <Popup show={!!$handler.error} let:titleID let:descID>
