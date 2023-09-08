@@ -20,9 +20,9 @@
             </a>
         </li>
         <li>
-            <a href="#top" class="wip">
+            <a href="/admin/proverbi">
                 <h2>Proverbi</h2>
-                <p>Gestisci i detti e i proverbi della parlata ligure, fornendo traduzioni letterali, approfondendo il significato e origine.</p>
+                <p>Gestisci i detti e i proverbi della parlata ligure, con la loro traduzione letterale e il loro significato, aggiungendo link alle voci del dizionario ed eventuali commenti.</p>
             </a>
         </li>
         <li>
