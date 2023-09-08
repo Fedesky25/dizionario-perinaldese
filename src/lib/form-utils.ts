@@ -86,7 +86,10 @@ export function clientFormHandler<T = null>(
                 err instanceof InvalidField ||
                 err instanceof PostgrestErrorWrapper
             ) error = err;
-            else error = err + '';
+            else {
+                console.error(err);
+                error = err + '';
+            }
         }
         submitting = false;
         who = null;
@@ -131,7 +134,7 @@ export function getIntList(data: FormData, key: string): number[] {
             `${raw === null ? "niente" : "file"} al ${i+1}-esimo elemento`
         );
         const v = +raw;
-        if(Number.isInteger(v) && v > 0) return v;
+        if(Number.isInteger(v) && v >= 0) return v;
         throw new InvalidField(key, 
             "Lista numeri interi positivi", 
             `${Number.isNaN(v) ? "stringa" : "numero decimale e/o negativo"} al ${i+1}-esimo elemento`
