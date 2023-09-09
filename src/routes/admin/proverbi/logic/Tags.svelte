@@ -18,16 +18,17 @@
 <div>
     <label for="add-tag" class="pillow" style:--clr="var(--olivina)">
         <Search 
-            autoclear
             id="add-tag"
             placeholder="Aggiungi..." 
             action={async (text) => {
                 const res = await client.from("tags").select("id, nome").like("nome", text+"%");
                 return res.data || [];
             }}
-            on:select={e => {
+            on:select={function (e) {
                 tags.push(e.detail);
                 tags = tags;
+                //@ts-ignore
+                this.clear();
             }}
             >
             <p slot="empty">Mentre scrivi compariranno le etichette che cominciano con ciò che scrivi.</p>

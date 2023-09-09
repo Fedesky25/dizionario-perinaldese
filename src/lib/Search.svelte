@@ -13,8 +13,6 @@
     export let id: string|undefined = undefined;
     export let delay = 500;
     export let action: (text: string) => Promise<T[]>;
-    export let autoclear = false;
-    export let autoblur = false;
 
     const regexp = /^[\/#\?\.&\s]*([\S\s]*)$/;
     let text = writable("");
@@ -26,13 +24,13 @@
     let firstTime = true;
     let input: HTMLInputElement;
 
+    export function clear() { $text = ''; }
+    export function blur() { input.blur(); }
+
     function emit(index: number) {
         active = -1;
         hidden = true;
         dispatch("select", results[index]);
-        if(autoclear) $text = '';
-        if(autoblur) input.blur();
-        
     }
 
     $: query = regexp.exec($text)?.[1] || "";
@@ -92,6 +90,8 @@
         on:focus={() => {hidden = false;}}
         on:keydown={handleArrows} 
         on:keydown
+        on:focus
+        on:blur
         use:debounceInput={{ delay, store: text }}>
     <div class="box" aria-hidden={hidden}>
         {#if query.length === 0}
