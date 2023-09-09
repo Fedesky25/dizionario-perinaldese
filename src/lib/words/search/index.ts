@@ -3,7 +3,7 @@ import type { Database } from "$lib/supabase";
 import Result  from "./Result.svelte";
 import { getSearchFilter } from "../utils";
 
-interface SearchResult<S extends boolean> {
+export interface SearchResult<S extends boolean> {
     traduzione: string;
     funzione: string;
     parola: string;
