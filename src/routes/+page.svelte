@@ -414,7 +414,7 @@
         .form-group--large {grid-column-end: span 2;}
     }
 
-    @media screen and (min-width: 860px) {
+    @media screen and (min-width: 53rem) {
         .water-mark {
             bottom: 5rem;
             left: 5rem;
@@ -559,7 +559,7 @@
         }
     }
 
-    @media screen and (min-width: 1080px) {
+    @media screen and (min-width: 70rem) {
         .griglia {
             grid-template-columns: 10px 40px minmax(18rem, 1.1fr) 40px .75fr 3fr 10px;
             grid-template-rows: 30px auto 110px auto auto 4.5rem auto 4.5rem 90px auto;
