@@ -329,6 +329,7 @@
         grid-column: 1/7;
         padding: 2rem 1rem;
         min-height: max-content;
+        margin-top: 4rem;
     }
     .convenzioni h2 {color: #9AB973;}
     .convenzioni p {
@@ -352,7 +353,7 @@
         }
         section.spaced {
             padding: 1.5rem;
-            margin: 0 3rem;
+            margin: 3rem 0;
         }
     }
     @media (min-width: 80ch) {
@@ -521,6 +522,7 @@
             column-gap: 1.25rem;
             row-gap: 1rem;
             padding: 0;
+            margin-top: 0;
         }
         .convenzioni .side-bar {
             grid-row: 1/3;
