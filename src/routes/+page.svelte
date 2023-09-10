@@ -194,7 +194,7 @@
 <footer>
     <a href="mailto:dizionario.perinaldese@gmail.com?subject=Richiesta informazioni">dizionario.perinaldese@gmail.com</a>
     <br><br>
-    Dizionario Pȓeiñaudencu&trade; 2020-2022
+    Dizionario Pȓeiñaudencu&trade; 2020-2023
 </footer>
 <div class="water-mark perinaldese" style:--b="{scrollY*0.2}px" role="presentation" aria-hidden="true">Pȓeiñaudencu</div>
 
