@@ -135,5 +135,8 @@
         li:hover .delete {
             transform: scale(1);
         }
+        ul {
+            padding-right: 1ch;
+        }
     }
 </style>
