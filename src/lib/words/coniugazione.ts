@@ -1,4 +1,4 @@
-import type { Declinazione, NumeroConiugazione, Voci, VociImperative, ConiugazioneRaw, StrictDeclinazione } from "./types"
+import type { NumeroConiugazione, Voci, VociImperative, ConiugazioneRaw, StrictDeclinazione, ConiugazioneRawTypes } from "./types"
 import { TipoVerbo } from "./types";
 import { formatta } from './utils';
 
@@ -105,32 +105,32 @@ const imperativo_default: ConiugazioneImperativo = {
 
 export enum OperazioneConiugazione { normal, del_I, del_H, add_H };
 
-interface Indicativo {
-    presente: Voci,
-    passato_prossimo: Voci,
-    imperfetto: Voci,
-    trapassato_prossimo: Voci,
-    futuro_semplice: Voci,
-    futuro_anteriore: Voci,
+interface Indicativo<T extends string|Voci> {
+    presente: T,
+    passato_prossimo: T,
+    imperfetto: T,
+    trapassato_prossimo: T,
+    futuro_semplice: T,
+    futuro_anteriore: T,
 }
-interface Congiuntivo {
-    presente: Voci,
-    passato: Voci,
-    imperfetto: Voci,
-    trapassato: Voci,
+interface Congiuntivo<T extends string|Voci> {
+    presente: T,
+    passato: T,
+    imperfetto: T,
+    trapassato: T,
 }
-interface Condizionale {
-    presente: Voci,
-    passato: Voci,
+interface Condizionale<T extends string|Voci> {
+    presente: T,
+    passato: T,
 }
-interface Coniugazione {
-    avere: boolean;
+export interface Coniugazione<T extends string|Voci> {
     gerundio: string;
-    participio: Required<Declinazione>;
-    indicativo: Indicativo,
-    congiuntivo: Congiuntivo,
-    condizionale: Condizionale,
-    imperativo: VociImperative
+    participio: string | StrictDeclinazione;
+    impersonale: T extends string ? true : false;
+    indicativo: Indicativo<T>,
+    congiuntivo: Congiuntivo<T>,
+    condizionale: Condizionale<T>,
+    imperativo: T extends Voci ? VociImperative : string;
 }
 
 export function computeInfinito(radice: string, numero: NumeroConiugazione, riflessivo: boolean) {
@@ -230,7 +230,11 @@ export function getDefaultTempo(tempo: IndiceTempo, numero: NumeroConiugazione, 
     return operateWithSuffix(operazione, getDefaultSuffissi(tempo, numero));
 }
 
-export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugazione {
+export function coniuga(radice: string, coniugazione: ConiugazioneRaw) {
+    return (coniugazione.tipo === TipoVerbo.impersonale) ? coniugaImpersonale(radice, coniugazione) : coniugaPersonale(radice, coniugazione);
+}
+
+export function coniugaPersonale(radice: string, coniugazione: ConiugazioneRawTypes["intr_avere"] | ConiugazioneRawTypes["altro"]): Coniugazione<Voci> {
     const num = coniugazione.numero
     const tipo = coniugazione.tipo;
     const values = coniugazione.tempi || [];
@@ -241,16 +245,18 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
     const avere = tipo === TipoVerbo.transitivo || tipo === TipoVerbo.intransitivo_avere;
     const ausiliare = avere ? ausiliari.avere : ausiliari.essere;
     const participio = computeParticipio(radice, coniugazione);
-    const desinenzaPP: [singolare: string, plurale: string] = avere 
+    const desinenzaPP: [singolare: string, plurale: string] = typeof participio === "string"
+        ? [participio, participio]
+        : tipo === TipoVerbo.transitivo
         ? [participio.ms, participio.ms] 
         : femminile 
         ? [participio.fs, participio.fp] 
         : [participio.ms, participio.mp];
 
     return {
-        avere,
         participio,
         gerundio: gerundio(radice, coniugazione.gerundio),
+        impersonale: false,
         indicativo: {
             presente: semplice(0), passato_prossimo: composto(0),
             imperfetto: semplice(1), trapassato_prossimo: composto(1),
@@ -302,6 +308,49 @@ export function coniuga(radice: string, coniugazione: ConiugazioneRaw): Coniugaz
     }
 }
 
+function coniugaImpersonale(radice: string, coniu: ConiugazioneRawTypes["impersonale"]): Coniugazione<string> {
+    const operazione = getOperazioneConiugazione(radice, coniu.numero);
+    const values = coniu.tempi || []
+    const p = coniu.participio
+    ? formatta(radice, coniu.participio.ms)
+    : radice+participi_default[coniu.numero][0];
+    
+    return {
+        gerundio: gerundio(radice, coniu.gerundio),
+        participio: p,
+        impersonale: true,
+        indicativo: {
+            presente: semplice(0), passato_prossimo: composto(0),
+            imperfetto: semplice(1), trapassato_prossimo: composto(1),
+            futuro_semplice: semplice(2), futuro_anteriore: composto(2)
+        }, 
+        congiuntivo: {
+            presente: semplice(3), passato: composto(3),
+            imperfetto: semplice(4), trapassato: composto(4)
+        },
+        condizionale: {
+            presente: semplice(5), passato: composto(5)
+        },
+        imperativo: imperativo()
+    }
+
+    function semplice(t: IndiceTempo) {
+        const voce = values[t];
+        let res = voce
+        ? formatta(radice, voce)
+        : operateWithRadice(radice, operazione, [getDefaultSuffissi(t, coniu.numero)[2]])[0];
+        if(startsWithVowel(res)) res = "l'" + res;
+        return 'u ' + res;
+    }
+
+    function composto(t: IndiceTempo) {
+        return `u ${ausiliari.essere[t][2]} ${p}`;
+    }
+    function imperativo() {
+        return values[6] ? formatta(radice, values[6]) : operateWithRadice(radice, operazione, [getDefaultSuffissiImperativo(false, coniu.numero)[2]])[0];
+    }
+}
+
 // coniuga('', 3, TipoVerbo.intransitivo_avere, {ms: '', mp: '', fs: '', fp: ''}, [null, null, null, null, null, null, null])
 
 type DesinenzeParticio = [string, string, string, string];
@@ -319,24 +368,28 @@ function PPvoce(radice: string, voce: string|undefined, num: NumeroConiugazione,
     return voce ? formatta(radice, voce) : radice + participi_default[num][index];
 }
 
-export function computeParticipio(radice: string, coniu: ConiugazioneRaw): StrictDeclinazione {
-    const values = coniu.participio;
-    const num = coniu.numero;
-    if(values) {
-        return onlyPPms(coniu.tipo) 
-        ? ({ ms: PPvoce(radice, values.ms, num, 0), mp: '', fs: '', fp: '' }) 
-        : ({
-            ms: PPvoce(radice, values.ms, num, 0),
-            mp: PPvoce(radice, values.mp, num, 1),
-            fs: PPvoce(radice, values.fs, num, 2),
-            fp: PPvoce(radice, values.fp, num, 3),
-        });
+export function computeParticipio(radice: string, coniu: ConiugazioneRaw): string|StrictDeclinazione {
+    if(coniu.tipo === TipoVerbo.intransitivo_avere || coniu.tipo === TipoVerbo.impersonale) {
+        return coniu.participio
+        ? formatta(radice, coniu.participio.ms)
+        : radice+participi_default[coniu.numero][0];
     }
-    return {
-        ms: radice+participi_default[num][0],
-        mp: radice+participi_default[num][1],
-        fs: radice+participi_default[num][2],
-        fp: radice+participi_default[num][3],
+    else {
+        const p = coniu.participio;
+        const num = coniu.numero;
+        return p
+        ? ({
+            ms: formatta(radice, p.ms),
+            mp: formatta(radice, p.mp),
+            fs: formatta(radice, p.fs),
+            fp: formatta(radice, p.fp),
+        })
+        : ({
+            ms: radice+participi_default[num][0],
+            mp: radice+participi_default[num][1],
+            fs: radice+participi_default[num][2],
+            fp: radice+participi_default[num][3],
+        })
     }
 }
 

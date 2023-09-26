@@ -25,6 +25,7 @@
     import OneLine from "./OneLine.svelte";
     import DeclinazioneTag from "./Declinazione.svelte";
     import Tempo from "./Tempo.svelte";
+	import TempiImpersonali from "./TempiImpersonali.svelte";
 
     export let word: CompleteDisplay;
 
@@ -87,14 +88,20 @@
                 <li>Gerundio presente: {coniugazione.gerundio}</li>
                 <li>
                     <span>Participio passato:</span>
-                    {#if coniugazione.avere}
-                    {coniugazione.participio.ms}
+                    {#if typeof coniugazione.participio === "string"}
+                    {coniugazione.participio}
                     {:else}
                     <DeclinazioneTag radice={word.radice} data={coniugazione.participio} />
                     {/if}
                 </li>
             </ul>
         </div>
+        {#if coniugazione.impersonale}
+            <Collapsible>
+                <h4 slot="title">Tempi finiti</h4>
+                <TempiImpersonali c={coniugazione} />
+            </Collapsible>
+        {:else}
         <Collapsible>
             <h4 slot="title">Indicativo</h4>
             <div class="cols">
@@ -122,6 +129,7 @@
                 <Tempo nome="Passato" voci={coniugazione.condizionale.passato} />
             </div>
         </Collapsible>
+        {/if}
     </div>
 {/if}
 
