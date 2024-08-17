@@ -1,5 +1,5 @@
 import type { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
-import { ActionFailure, error, fail, type SubmitFunction } from "@sveltejs/kit";
+import { error, fail, type SubmitFunction } from "@sveltejs/kit";
 import { writable, type Readable } from "svelte/store";
 
 interface InvalidFieldI {
