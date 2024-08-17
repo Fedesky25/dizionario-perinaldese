@@ -3,7 +3,7 @@ import { postgresError2HTTPError } from "$lib/db";
 import { error, redirect } from "@sveltejs/kit";
 import { InvalidField } from "$lib/form-utils";
 
-import { getDataFromForm, createWord, updateWord, getCollegamenti, getID, type AllDataDB, updateCollegamenti } from "./logic";
+import { getDataFromForm, updateWord, type AllDataDB, updateCollegamenti } from "$lib/words/editor/logic";
 
 export const actions: Actions = {
     default: async ({ params, request, locals }) => {
@@ -20,14 +20,9 @@ export const actions: Actions = {
                 details: ""+err
             });
         }
-        let id: number;
-        if(params.id === "crea") id = await createWord(data, client);
-        else {
-            id = getID(params);
-            await updateWord(id, data, client);
-        }
+        const id = +params.id;
+        await updateWord(id, data, client);
         await updateCollegamenti(id, form, client);
-        if(params.id === "crea") return { success: true as const };
-        else throw redirect(303, "/admin/dizionario");
+        throw redirect(303, "/admin/dizionario");
     }
 };
