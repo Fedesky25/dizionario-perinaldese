@@ -1,8 +1,14 @@
 import type { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
-import { error, type SubmitFunction } from "@sveltejs/kit";
+import { ActionFailure, error, fail, type SubmitFunction } from "@sveltejs/kit";
 import { writable, type Readable } from "svelte/store";
 
-export class InvalidField extends Error {
+interface InvalidFieldI {
+    readonly field: string;
+    readonly expected: string;
+    readonly got: string|undefined;
+}
+
+export class InvalidField extends Error implements InvalidFieldI {
     public readonly field: string;
     public readonly expected: string;
     public readonly got: string|undefined;
@@ -18,6 +24,21 @@ export class InvalidField extends Error {
         const base = `${this.field} deve essere ${this.expected}`;
         if(this.got) return base + ", ma ottenuto " + this.got;
         else return base;
+    }
+
+    toJSON(): InvalidFieldI {
+        return ({
+            field: this.field,
+            expected: this.expected,
+            got: this.got
+        })
+    }
+
+    toFailure() {
+        return fail(400, { 
+            success: false as const, field: this.field, 
+            expected: this.expected, got: this.got
+        });
     }
 }
 
@@ -48,7 +69,7 @@ export function datoInvalido(msg: string): never {
 }
 
 
-type FormError = InvalidField|PostgrestErrorWrapper|string|null;
+export type FormError = InvalidField|PostgrestErrorWrapper|string|null;
 interface FormStoreData<T> {
     submitting: boolean;
     error: FormError;
@@ -57,6 +78,7 @@ interface FormStoreData<T> {
 interface FormStore<T> extends Readable<FormStoreData<T>> {
     submit: SubmitFunction;
     get value(): FormStoreData<T>;
+    setError(err: FormError): void;
     reset(): void;
 }
 export type ClientFormHandlerCallback<T> = (arg: {formData: FormData, element: HTMLFormElement, who: T}) => Promise<void>
@@ -99,6 +121,10 @@ export function clientFormHandler<T = null>(
         subscribe,
         submit,
         get value() { return {submitting, error, who} },
+        setError(err) {
+            error = err;
+            set({submitting, error, who});
+        },
         reset() {
             error = null;
             set({submitting, error, who});
