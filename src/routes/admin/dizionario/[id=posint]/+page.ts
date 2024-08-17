@@ -1,13 +1,12 @@
 import { postgresError2HTTPError } from "$lib/db";
 import type { Complete, CompleteAdmin } from "$lib/words/types";
-import { emptyWord } from "$lib/words/utils";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
-import { getID } from "./logic";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 let fgs: {id: number, nome: string}[] = [];
 let last_date = Date.now();
+
 
 async function getfunzioni(client: SupabaseClient) {
     const now = Date.now();
@@ -35,12 +34,7 @@ interface EditorData {
 
 export const load: PageLoad<EditorData> = async ({ params, parent }) => {
     const { supabase } = await parent();
-    if(params.id === "crea") return ({
-        id: null,
-        parola: emptyWord(),
-        funzioni: await getfunzioni(supabase)
-    });
-    const id = getID(params);
+    const id = +params.id;
     const res = await Promise.all([getdoc(id, supabase), getfunzioni(supabase)]);
     return ({ id, parola: res[0], funzioni: res[1] });
 };

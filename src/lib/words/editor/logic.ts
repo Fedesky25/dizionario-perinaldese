@@ -4,14 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { postgresError2HTTPError } from "$lib/db";
 import { error } from "@sveltejs/kit";
 
-import type { RouteParams } from "./$types";
-
-export function getID(params: RouteParams) {
-    const id = +params.id;
-    if(!Number.isInteger(id) || id < 0) throw error(400, `${params.id} non è un ID valido`);
-    return id;
-}
-
 function isNonEmptyString<T = any>(v: T): T extends string ? boolean : false {
     //@ts-ignore
     return (typeof v === "string") && v.length > 0;
@@ -91,7 +83,7 @@ function getConiugazione(data: FormData): ConiugazioneDB {
     const tipo = getInt(data, "coniugazione.tipo");
     if(!TipoVerbo[tipo]) throw new InvalidField("coniugazione.tipo", "valore tra: 1, 2, 3, 4, 5", tipo.toString());
     const gerundio = getStringOrNull(data, "coniugazione.gerundio");
-    const voci: TempiRaw = [
+    const voci: TempiRaw<Voci> = [
         getTempo(data, 0, 6),
         getTempo(data, 1, 6),
         getTempo(data, 2, 6),

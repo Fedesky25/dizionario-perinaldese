@@ -1,6 +1,6 @@
 import type { Actions } from "./$types";
 import { postgresError2HTTPError } from "$lib/db";
-import { error, fail, redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { InvalidField } from "$lib/form-utils";
 
 import { getDataFromForm, createWord, updateWord, getCollegamenti, getID, type AllDataDB, updateCollegamenti } from "./logic";
@@ -14,10 +14,7 @@ export const actions: Actions = {
         let data: AllDataDB;
         try { data = getDataFromForm(form, funzioni.data.map(v => v.id)); }
         catch(err) {
-            if(err instanceof InvalidField) return fail(400, {
-                success: false as const, field: err.field,
-                expected: err.expected, got: err.got
-            });
+            if(err instanceof InvalidField) return err.toFailure();
             else throw error(500, {
                 message: "Errore ignoto",
                 details: ""+err

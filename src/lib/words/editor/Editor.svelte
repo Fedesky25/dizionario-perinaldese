@@ -1,36 +1,37 @@
 <script lang="ts">
-    import type { ActionData, PageData } from "./$types";
 	import Coniugazione from "./Coniugazione.svelte";
     import Declinazione from "./Declinazione.svelte";
     import Collegamenti from "./Collegamenti.svelte";
     import Esempi from "./Esempi.svelte";
-    import { emptyConiugazione, emptyWord, splitCollegamenti } from "$lib/words/utils";
+    import { emptyConiugazione, splitCollegamenti } from "$lib/words/utils";
 	import type { CompleteAdmin } from "$lib/words/types";
 	import { enhance } from "$app/forms";
-	import type { SubmitFunction } from "@sveltejs/kit";
-	import { createWord, getDataFromForm, updateCollegamenti, updateWord } from "./logic";
-	import { InvalidField } from "$lib/form-utils";
-	import { goto } from "$app/navigation";
+	import type { Database } from "$lib/supabase";
+	import type { SupabaseClient } from "@supabase/supabase-js";
+	import { clientFormHandler, type ClientFormHandlerCallback } from "$lib/form-utils";
+	import FormError from "$lib/FormError.svelte";
 
-    export let form: ActionData;
-    export let data: PageData;
-    const fgs = data.funzioni;
+    export let id: number|null;
+    export let client: SupabaseClient<Database>;
+    export let fgs: {id: number, nome: string}[];
+    export let word: CompleteAdmin;
+    export let handler: ClientFormHandlerCallback<null>;
 
-    let word: CompleteAdmin;
+    const store = clientFormHandler(null, handler);
+    
     let parola: string;
     let radice: string;
     let traduzione: string;
     let funzione: number;
 
+    $: destructureWord(word);
     function destructureWord(w: CompleteAdmin) {
-        word = w;
         parola = w.parola;
         radice = w.radice||"";
         traduzione = w.traduzione;
         funzione = w.funzione;
     }
 
-    $: destructureWord(data.parola);
     $: valid = parola && traduzione; // && (
     //     (funzione < 4 && word.declinazione) ||
     //     (funzione === 4 && word.coniugazione) ||
@@ -38,49 +39,13 @@
     // );
     $: parola_automatica = funzione <= 4;
     $: [vedi_anche, sinonimi, contrari] = splitCollegamenti(word.collegamenti||[]);
-
-    const onsubmit: SubmitFunction = async ({ cancel, formData }) => {
-        cancel();
-        try {
-            const word = getDataFromForm(formData, data.funzioni.map(v => v.id));
-            let id = data.id;
-            if(id) await updateWord(id, word, data.supabase);
-            else id = await createWord(word, data.supabase);
-            await updateCollegamenti(id, formData, data.supabase);
-            form = { success: true };
-            if(data.id) goto("/admin/dizionario");
-            else data.parola = emptyWord(funzione); 
-        }
-        catch(err) {
-            if(err instanceof InvalidField) form = {
-                success: false, field: err.field,
-                expected: err.expected, got: err.got
-            };
-            else if(
-                typeof err === "object" && err
-                && "body" in err && typeof err.body === "object" && err.body
-                && "message" in err.body && typeof err.body.message === "string"
-            ) form = {
-                success: false, field: err.body.message,
-                // @ts-ignore
-                expected: err.body.details||"", got: undefined
-            }
-            else {
-                console.error(err);
-                form = {
-                    success: false, field: "Ignoto",
-                    expected: "Ignoto", got: ""+err
-                };
-            }
-        }
-    }
 </script>
 
 <svelte:head>
-    <title>{data.id ? `Modifica «${parola}»` : "Crea parola"} | Dizionario Perinaldese</title>
+    <title>{id ? `Modifica «${parola}»` : "Crea parola"} | Dizionario Perinaldese</title>
 </svelte:head>
 
-<form method="POST" use:enhance={onsubmit}>
+<form method="POST" use:enhance={store.submit}>
     <div class="sticky-middle">
         <div class="buttons">
             <button
@@ -94,7 +59,7 @@
                 </svg>
                 <span>Salva</span>
             </button>
-            {#if data.id}
+            {#if id}
             <a href="/admin/dizionario" style="--clr: lightslategray;">
                 <svg style="transform: rotate(90deg);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path fill="currentColor" d="M 13.035156 2.9648438 C 11.930156 2.9648438 11.035156 3.8598438 11.035156 4.9648438 L 11.035156 15.964844 L 5.9648438 15.964844 C 5.5608438 15.964844 5.1950156 16.206078 5.0410156 16.580078 C 4.8850156 16.954078 4.9718125 17.384875 5.2578125 17.671875 L 14.328125 26.742188 C 14.719125 27.133187 15.351187 27.133187 15.742188 26.742188 L 24.814453 17.671875 C 25.005453 17.480875 25.107422 17.224844 25.107422 16.964844 C 25.107422 16.835844 25.08225 16.704078 25.03125 16.580078 C 24.87725 16.206078 24.511422 15.964844 24.107422 15.964844 L 19.035156 15.964844 L 19.035156 4.9648438 C 19.035156 3.8598438 18.140156 2.9648438 17.035156 2.9648438 L 13.035156 2.9648438 z"></path></svg>
                 <span>Indietro</span>
@@ -116,7 +81,7 @@
     <div class="body">
         <h1>
             <span>
-                {data.id ? "Aggiorna" : "Aggiungi"}
+                {id ? "Aggiorna" : "Aggiungi"}
                 <select name="funzione" bind:value={funzione}>
                     {#each fgs as fg}
                     <option value={fg.id}>{fg.nome}</option>
@@ -166,38 +131,20 @@
         <h2>Collegamenti</h2>
         <div class="links">
             <h3>Vedi anche</h3>
-            <Collegamenti client={data.supabase} name="vedi_anche" data={vedi_anche} />
+            <Collegamenti {client} name="vedi_anche" data={vedi_anche} />
             <h3>Sinonimi</h3>
-            <Collegamenti client={data.supabase} name="sinonimi" data={sinonimi} />
+            <Collegamenti {client} name="sinonimi" data={sinonimi} />
             <h3>Contrari</h3>
-            <Collegamenti client={data.supabase} name="sinonimi" data={contrari} />
+            <Collegamenti {client} name="sinonimi" data={contrari} />
         </div>
         <hr>
         <h2>Esempi</h2>
         <Esempi data={word.esempi||[]} />
     </div>
-    {#if form?.success === false}
-    <div class="sticky-middle">
-        <div>
-            <h2 class="err">Errore</h2>
-            <table>
-                <tr>
-                    <th scope="row">Campo:</th>
-                    <td>{form.field}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Atteso:</th>
-                    <td>{form.expected}</td>
-                </tr>
-                {#if form.got}
-                <tr>
-                    <th scope="row">Ottenuto:</th>
-                    <td>{form.got}</td>
-                </tr>
-                {/if}
-            </table>
+    {#if $store.error}
+        <div class="stricky-middle">
+            <FormError error={$store.error} />
         </div>
-    </div>
     {/if}
 </form>
 
@@ -382,23 +329,5 @@
         .links h3 {
             grid-row: 1;
         }
-    }
-    h2.err {
-        color: var(--rosso);
-        font-size: 1.2rem;
-        margin-bottom: .5rem;
-    }
-    table {
-        margin: 0 auto;
-    }
-    th {
-        text-align: right;
-        font-weight: 600;
-    }
-    td {
-        text-align: left;
-    }
-    th, td {
-        padding: .2rem .3ch;
     }
 </style>
