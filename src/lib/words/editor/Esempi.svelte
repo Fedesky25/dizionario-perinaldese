@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Esempio } from "$lib/words/types";
+	import { handleSpecialChars } from "../utils";
     export let data: Esempio[];
 
     const svgid = crypto.randomUUID();
@@ -48,12 +49,14 @@
             <td>
                 <textarea 
                 bind:value={esempio.originale} 
+                on:keydown={handleSpecialChars}
                 name={valid ? "esempi.originale" : null}
                 ></textarea>
             </td>
             <td>
                 <textarea 
                 bind:value={esempio.traduzione}
+                on:keydown={handleSpecialChars}
                 name={valid ? "esempi.traduzione" : null}
                 ></textarea>
             </td>

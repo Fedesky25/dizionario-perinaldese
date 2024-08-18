@@ -1,5 +1,6 @@
 <script context="module">
 	import { browser } from "$app/environment";
+	import { handleSpecialChars } from "./utils";
 
 	let w1 = 0.190, w2 = 0.494;
 	if(browser) {
@@ -54,6 +55,7 @@
 		{disabled}
 		{readonly}
 		bind:value={value}
+		on:keydown={handleSpecialChars}
 		type="text"
 		size={value.length + 1}
 		autocapitalize="off"

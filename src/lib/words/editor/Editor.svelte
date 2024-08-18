@@ -3,7 +3,7 @@
     import Declinazione from "./Declinazione.svelte";
     import Collegamenti from "./Collegamenti.svelte";
     import Esempi from "./Esempi.svelte";
-    import { emptyConiugazione, splitCollegamenti } from "$lib/words/utils";
+    import { emptyConiugazione, handleSpecialChars, splitCollegamenti } from "$lib/words/utils";
 	import type { CompleteAdmin } from "$lib/words/types";
 	import { enhance } from "$app/forms";
 	import type { Database } from "$lib/supabase";
@@ -96,7 +96,13 @@
                 autocomplete="off"
                 bind:value={parola}>»</span>
             {#if parola_automatica}
-                <span>avente radice <input type="text" name="radice" autocomplete="off" size={radice.length+1} bind:value={radice}></span>
+                <span>avente radice <input 
+                    type="text" 
+                    name="radice" 
+                    autocomplete="off" 
+                    size={radice.length+1} 
+                    on:keydown={handleSpecialChars}
+                    bind:value={radice}></span>
             {/if}
         </h1>
         <Declinazione 
@@ -113,7 +119,14 @@
         <section class="two-cols">
             <div class="named-input">
                 <span>Traduzione:</span>
-                <input type="text" name="traduzione" autocomplete="off" bind:value={traduzione} autocapitalize="off" />
+                <input 
+                    type="text" 
+                    name="traduzione" 
+                    autocomplete="off" 
+                    autocapitalize="off" 
+                    on:keydown={handleSpecialChars}
+                    bind:value={traduzione} 
+                    />
             </div>
             <div class="named-input">
                 <span>Ordine:</span>
@@ -125,7 +138,13 @@
                     <option value={4}>4&ordm;</option>
                 </select>
             </div>
-            <textarea placeholder="Descrizione..." rows="3" name="descrizione" autocomplete="off" value={word.descrizione||''}></textarea>
+            <textarea 
+                rows="3" 
+                placeholder="Descrizione..." 
+                name="descrizione" 
+                autocomplete="off" 
+                value={word.descrizione||''}
+                on:keydown={handleSpecialChars}></textarea>
         </section>
         <hr>
         <h2>Collegamenti</h2>
