@@ -23,7 +23,7 @@
         letterale = d.letterale;
     }
     
-    $: valid = data.originale.length > 0 && data.letterale.length > 0;
+    $: valid = originale.length > 0 && letterale.length > 0;
 </script>
 
 <svelte:head>
