@@ -56,7 +56,7 @@
             {/each}
             <Tempo index={6} {radice} 
                 soggetti={soggetti_imp} 
-                values={data.tempi?.[5] || null} 
+                values={data.tempi?.[6] || null} 
                 defaults={operateWithSuffix(operazione, getDefaultSuffissiImperativo(riflessivo, data.numero))} />
         </div>
     </Collapsible>
