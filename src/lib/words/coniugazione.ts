@@ -86,17 +86,19 @@ const coniugazione_default: DesinenzeConiugazioni = [
 ]
 
 interface ConiugazioneImperativo {
-    riflessivo: [VociImperative, VociImperative, VociImperative]
-    attivo: [VociImperative, VociImperative, VociImperative]
+    riflessivo: [VociImperative, VociImperative, VociImperative, VociImperative]
+    attivo: [VociImperative, VociImperative, VociImperative, VociImperative]
 }
 
 const imperativo_default: ConiugazioneImperativo = {
     riflessivo: [
+        ['none', 'none', 'none', 'none', 'none'],
         ['até', 'ese', 'amuse', 'aive', 'ese'],
         ['eté', 'ese', 'emuse', 'eive', 'ese'],
         ['ité', 'ese', 'imuse', 'iive', 'ese']
     ],
     attivo: [
+        ['none', 'none', 'none', 'none', 'none'],
         ['a', 'e', 'amu', 'ai', 'e'],
         ['e', 'e', 'emu', 'ei', 'e'],
         ['i', 'e', 'imu', 'ii', 'e']
@@ -181,8 +183,8 @@ export function getDefaultSuffissi(tempo: IndiceTempo, numero: NumeroConiugazion
 
 export function getDefaultSuffissiImperativo(riflessivo: boolean, numero: NumeroConiugazione) {
     return riflessivo 
-    ? imperativo_default.riflessivo[numero-1]
-    : imperativo_default.attivo[numero-1]
+    ? imperativo_default.riflessivo[numero]
+    : imperativo_default.attivo[numero]
 }
 
 export function operateWithSuffix<T extends string[]>(operazione: OperazioneConiugazione, arr: T): T {
